@@ -1,0 +1,19 @@
+.status .combo {
+  border-color: #d4a6ff;
+  color: #e4c7ff;
+  box-shadow: 0 0 18px #ae70e833;
+}
+
+.intro-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.intro-actions .mode {
+  background: #13251f;
+  border-color: #5f7868;
+  color: #b8cdb8;
+  box-shadow: none;
+}
