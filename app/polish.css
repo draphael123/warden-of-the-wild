@@ -17,3 +17,121 @@
   color: #b8cdb8;
   box-shadow: none;
 }
+
+body {
+  background:
+    radial-gradient(circle at 50% -20%, #416c50 0, transparent 48%),
+    repeating-linear-gradient(90deg, #10291f 0 34px, #112c21 34px 68px);
+}
+
+.game-shell {
+  filter: drop-shadow(0 30px 45px #07110caa);
+}
+
+.eyebrow {
+  color: #d5c78d;
+  font-weight: 800;
+}
+
+h1 {
+  color: #fff2c7;
+  text-shadow: 0 3px 0 #493c28, 0 7px 20px #000;
+}
+
+.status span {
+  background: linear-gradient(#514832, #302c21);
+  border: 2px solid #8d7c51;
+  box-shadow: inset 0 0 0 1px #1d1a14, 0 3px 0 #15130f;
+  color: #d7ca9c;
+}
+
+.stage-wrap {
+  border: 7px solid #59472e;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 2px #c3a56b, 0 0 0 3px #241d14, 0 25px 70px #0009;
+}
+
+.message {
+  background: linear-gradient(#ead9a9, #c4aa6d);
+  border: 2px solid #59472e;
+  color: #403622;
+  font-weight: 700;
+  text-shadow: 0 1px #fff7;
+}
+
+footer {
+  padding: 10px;
+  margin-top: 7px;
+  background: linear-gradient(#473a27, #282319);
+  border: 2px solid #806a45;
+  box-shadow: inset 0 0 0 1px #17140f;
+}
+
+.element {
+  background: linear-gradient(#3b392b, #24251d);
+  border: 2px solid #6c6548;
+  box-shadow: inset 0 0 0 1px #171812, 0 3px 0 #17140f;
+}
+
+.element:hover,
+.element.active {
+  background: color-mix(in srgb, var(--e) 18%, #2d3023);
+  box-shadow: inset 0 0 0 1px #171812, 0 4px 0 #17140f, 0 0 16px color-mix(in srgb, var(--e) 35%, transparent);
+}
+
+.secondary {
+  background: linear-gradient(#5c5035, #332e22);
+  border: 2px solid #857552;
+  box-shadow: inset 0 0 0 1px #211d15;
+}
+
+.wave,
+.intro button {
+  background: linear-gradient(#f1d982, #b98736 58%, #8a5c25);
+  border: 2px solid #ffe7a0;
+  box-shadow: inset 0 0 0 2px #744a1c, 0 4px 0 #412a15, 0 8px 20px #0007;
+}
+
+.surge {
+  min-width: 132px;
+  padding: 8px 12px;
+  background: linear-gradient(#80ae50, #3e702f);
+  border: 2px solid #c5e782;
+  box-shadow: inset 0 0 0 2px #315525, 0 4px 0 #1c3519;
+  color: #f4ffd7;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+
+.surge span {
+  display: block;
+  margin-top: 3px;
+  font-size: 8px;
+  font-weight: 500;
+}
+
+.surge:disabled {
+  filter: grayscale(.75);
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+aside {
+  padding: 5px 10px;
+  background: #111f18aa;
+  border-left: 3px solid #8e7446;
+}
+
+button:focus-visible {
+  outline: 3px solid #fff0a8;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

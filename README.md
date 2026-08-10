@@ -8,7 +8,9 @@ A compact elemental tower-defense game built for the browser. Defend the Heartst
 - **Overgrowth Arc:** Storm chains farther through rooted enemies.
 - **Toxic Flame:** Fire spreads burning poison through nearby targets.
 
-The game includes ten tower sites, three-level tower upgrades, per-tower target priorities, three regular enemy archetypes, a two-phase boss, reaction combo scoring, persistent best scores, responsive touch controls, optional sound, pause/fast-forward controls, and full restart support. Veteran mode makes enemies tougher and awards a 50% score bonus for replay runs.
+The game includes ten tower sites, three-level tower upgrades, per-tower target priorities, three regular enemy archetypes, a two-phase boss, reaction combo scoring, the active Wild Surge battlefield power, persistent best scores, responsive touch controls, optional sound, pause/fast-forward controls, and full restart support. Veteran mode makes enemies tougher and awards a 50% score bonus for replay runs.
+
+The original visual direction uses a bright illustrated woodland, chunky stone-and-timber tower silhouettes, animated water, environmental details, exaggerated enemies, readable impact effects, and carved wood-and-parchment controls.
 
 ## Run locally
 
