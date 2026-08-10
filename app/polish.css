@@ -38,6 +38,10 @@ h1 {
   text-shadow: 0 3px 0 #493c28, 0 7px 20px #000;
 }
 
+header nav { display:flex; gap:6px; margin-top:8px; }
+header nav button { padding:5px 9px; background:#2e2a1f; border:1px solid #776747; color:#cfbf8f; font-size:8px; font-weight:900; letter-spacing:.14em; cursor:pointer; }
+header nav button:hover { color:#fff0b6; border-color:#c5aa66; }
+
 .status span {
   background: linear-gradient(#514832, #302c21);
   border: 2px solid #8d7c51;
@@ -50,6 +54,24 @@ h1 {
   border-radius: 5px;
   box-shadow: inset 0 0 0 2px #c3a56b, 0 0 0 3px #241d14, 0 25px 70px #0009;
 }
+
+.menu-overlay { position:absolute; inset:0; z-index:5; display:grid; place-items:center; padding:28px; background:#09140fc9; backdrop-filter:blur(3px); }
+.folio { position:relative; width:min(820px,96%); max-height:92%; overflow:auto; padding:28px 32px; color:#3d321f; background:linear-gradient(100deg,#c8ad70,#f1dfaa 8%,#ead59b 92%,#b7965b); border:4px solid #5b4528; box-shadow:inset 0 0 0 2px #fff0b077,0 18px 50px #000b; }
+.folio::before { content:""; position:absolute; inset:9px; border:1px solid #84693d66; pointer-events:none; }
+.folio h2 { margin:5px 0 7px; font:700 clamp(24px,4vw,36px) Georgia,serif; color:#3c2b18; }
+.folio h3 { margin:0 0 10px; padding-bottom:6px; border-bottom:2px solid #80653b; font:700 17px Georgia,serif; }
+.folio-kicker { color:#76562d; font-size:9px; font-weight:900; letter-spacing:.28em; }
+.folio-lede { margin:0 0 18px; color:#695637; font:italic 13px Georgia,serif; }
+.folio-close { position:absolute; z-index:2; top:12px; right:14px; width:31px; height:31px; background:#5a4025; border:2px solid #b69658; color:#f7e5af; font:22px/1 Georgia,serif; cursor:pointer; }
+.level-map { display:grid; gap:9px; margin-top:20px; }
+.level-card { display:grid; grid-template-columns:50px 1fr auto; align-items:center; gap:12px; padding:12px; background:#6c523029; border:2px solid #8d7044; }
+.level-card i { display:grid; place-items:center; width:42px; height:42px; border-radius:50%; background:#54743e; border:3px solid #3f4d2f; color:#f5df9d; font:bold 19px Georgia,serif; }
+.level-card div { display:flex; flex-direction:column; gap:3px; }.level-card b{font:700 15px Georgia,serif}.level-card span{font-size:10px;color:#725f40}.level-card button{padding:10px 16px;background:linear-gradient(#e5c568,#a9772f);border:2px solid #65451e;font-weight:900;cursor:pointer}.level-card.locked{filter:saturate(.3);opacity:.62}.level-card.locked i{background:#695e4a}.level-card em{font-style:normal}
+.guide-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:20px; }
+.guide-grid article { display:grid; grid-template-columns:37px 1fr; gap:9px; align-items:start; padding:7px 0; border-bottom:1px solid #8c704044; }
+.guide-grid article b { font:700 13px Georgia,serif; }.guide-grid article p{margin:2px 0 0;font-size:10px;line-height:1.35;color:#695537}
+.guide-icon,.beast{display:grid;place-items:center;width:33px;height:33px;border-radius:50%;background:#3e3b2c;border:2px solid #6d5a37;font-style:normal;font-size:17px}.guide-icon.fire{color:#ff7654}.guide-icon.frost{color:#6ddbef}.guide-icon.storm{color:#d5b8ff}.guide-icon.nature{color:#82ca68}.beast{color:#efe0ad}.beast.wisp{color:#93e6dc}.beast.boss{color:#e18457}
+.settings-list { display:grid; gap:9px; margin-top:22px; }.settings-list button{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#6b52302b;border:2px solid #8d7044;color:#3d321f;text-align:left;cursor:pointer}.settings-list span{display:flex;flex-direction:column;gap:3px}.settings-list b{font:700 14px Georgia,serif}.settings-list small{font-size:10px;color:#715c3c}.settings-list strong{padding:7px 9px;background:#4c6137;color:#f2e6b2;font-size:9px;letter-spacing:.12em}.setting-note{font:italic 11px Georgia,serif;color:#715c3c}
 
 .message {
   background: linear-gradient(#ead9a9, #c4aa6d);
@@ -150,3 +172,5 @@ button:focus-visible {
     transition-duration: 0.001ms !important;
   }
 }
+
+@media(max-width:700px){.menu-overlay{padding:8px}.folio{padding:24px 18px}.guide-grid{grid-template-columns:1fr}.level-card{grid-template-columns:42px 1fr}.level-card button,.level-card em{grid-column:2;justify-self:start}header nav{flex-wrap:wrap}}
