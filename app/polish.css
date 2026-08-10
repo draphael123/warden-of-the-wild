@@ -134,6 +134,11 @@ aside {
   border-left: 3px solid #8e7446;
 }
 
+.dot.wisp {
+  background: #b8f5df;
+  box-shadow: 0 0 7px #b8f5df;
+}
+
 button:focus-visible {
   outline: 3px solid #fff0a8;
   outline-offset: 3px;

@@ -22,5 +22,6 @@ test("server-renders Warden of the Wild", async () => {
   assert.match(html, /MODE ·.*STANDARD/);
   assert.match(html, /SOUND ON/);
   assert.match(html, /Place a root snare/);
+  assert.match(html, /Lifebloom/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/);
 });
