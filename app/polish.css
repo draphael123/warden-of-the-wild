@@ -114,6 +114,9 @@ footer {
   box-shadow: inset 0 0 0 2px #744a1c, 0 4px 0 #412a15, 0 8px 20px #0007;
 }
 
+.wave.rush { background:linear-gradient(#ffe17e,#c46d2e 62%,#7e3f22); animation:rush-ready .75s ease-in-out infinite alternate; }
+@keyframes rush-ready { to { box-shadow:inset 0 0 0 2px #744a1c,0 4px 0 #412a15,0 0 22px #ffbf4c99; } }
+
 .surge {
   min-width: 132px;
   padding: 8px 12px;
