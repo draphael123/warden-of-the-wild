@@ -36,23 +36,23 @@ export default function Home(){
   const game=useRef<any>(null);
   const [selected,setSelected]=useState<Element>("fire");
   const selectedRef=useRef<Element>("fire");
-  const [ui,setUi]=useState({gold:260,lives:20,wave:0,score:0,state:"ready",message:"The Hollow stirs at dusk.",speed:1,combo:0,best:0,muted:false,veteran:false,ability:0});
+  const [ui,setUi]=useState({gold:260,lives:20,wave:0,score:0,state:"ready",message:"The Hollow stirs at dusk.",speed:1,combo:0,best:0,muted:false,veteran:false,ability:0,aiming:false});
   const setElement=(e:Element)=>{setSelected(e);selectedRef.current=e};
 
   const reset=useCallback(()=>{
     const best=typeof window!=="undefined"?Number(localStorage.getItem("warden-best")||0):0;
-    game.current={gold:260,lives:20,wave:0,score:0,state:"ready",towers:[] as Tower[],enemies:[] as Enemy[],bolts:[] as Bolt[],particles:[] as Particle[],texts:[] as Popup[],spawn:[] as any[],spawnClock:0,nextId:1,time:0,shake:0,flash:0,message:"Build your first elemental tower.",hover:-1,selectedTower:-1,speed:1,combo:0,comboTimer:0,best,muted:false,veteran:false,ability:0,abilityShown:0};
-    setUi({gold:260,lives:20,wave:0,score:0,state:"ready",message:"Build your first elemental tower.",speed:1,combo:0,best,muted:false,veteran:false,ability:0});
+    game.current={gold:260,lives:20,wave:0,score:0,state:"ready",towers:[] as Tower[],enemies:[] as Enemy[],bolts:[] as Bolt[],particles:[] as Particle[],texts:[] as Popup[],spawn:[] as any[],spawnClock:0,nextId:1,time:0,shake:0,flash:0,message:"Build your first elemental tower.",hover:-1,mouse:{x:500,y:300},selectedTower:-1,speed:1,combo:0,comboTimer:0,best,muted:false,veteran:false,ability:0,abilityShown:0,aiming:false,surgeMark:null};
+    setUi({gold:260,lives:20,wave:0,score:0,state:"ready",message:"Build your first elemental tower.",speed:1,combo:0,best,muted:false,veteran:false,ability:0,aiming:false});
   },[]);
   useEffect(()=>reset(),[reset]);
 
-  const sync=()=>{const g=game.current;if(g)setUi({gold:g.gold,lives:g.lives,wave:g.wave,score:g.score,state:g.state,message:g.message,speed:g.speed,combo:g.combo,best:g.best,muted:g.muted,veteran:g.veteran,ability:g.ability})};
+  const sync=()=>{const g=game.current;if(g)setUi({gold:g.gold,lives:g.lives,wave:g.wave,score:g.score,state:g.state,message:g.message,speed:g.speed,combo:g.combo,best:g.best,muted:g.muted,veteran:g.veteran,ability:g.ability,aiming:g.aiming})};
   const startWave=()=>{const g=game.current;if(!g||g.state==="wave"||g.state==="lost"||g.state==="won")return;if(g.wave>=waves.length)return;if(!g.muted)tone("wave");g.wave++;g.state="wave";g.message=g.wave===6?"THE ASHEN WARDEN APPROACHES":"Wave "+g.wave+" breaks from the Hollow";g.spawn=[];let delay=.5;waves[g.wave-1].forEach(group=>{for(let i=0;i<group.count;i++){g.spawn.push({...group,at:delay});delay+=group.gap}delay+=1});g.spawnClock=0;sync()};
 
   const upgrade=()=>{const g=game.current;if(!g||g.selectedTower<0)return;const t=g.towers[g.selectedTower],price=75+t.level*55;if(t.level<3&&g.gold>=price){if(!g.muted)tone("upgrade");g.gold-=price;t.level++;t.range+=12;g.message=`${names[t.element]} tower awakened to level ${t.level}`;burst(g,t.x,t.y,colors[t.element],16);sync()}};
   const sell=()=>{const g=game.current;if(!g||g.selectedTower<0)return;const t=g.towers[g.selectedTower];g.gold+=Math.floor((costs[t.element]+(t.level-1)*75)*.65);g.towers.splice(g.selectedTower,1);g.selectedTower=-1;g.message="Tower reclaimed. Its essence returns.";sync()};
   const toggleTarget=()=>{const g=game.current;if(!g||g.selectedTower<0)return;const tower=g.towers[g.selectedTower];tower.priority=tower.priority==="first"?"strong":"first";g.message=`Targeting ${tower.priority} enemies`;sync()};
-  const castSurge=()=>{const g=game.current;if(!g||g.ability>0||g.state!=="wave")return;g.ability=22;g.message="WILD SURGE · THE FOREST ANSWERS";g.shake=6;if(!g.muted)tone("upgrade");for(const enemy of g.enemies){if(!enemy.alive)continue;enemy.root=Math.max(enemy.root,2.2);damage(g,enemy,28);burst(g,enemy.x,enemy.y,colors.nature,10)}g.texts.push({x:500,y:300,label:"WILD SURGE!",life:1.2,color:"#d9ff8b"});sync()};
+  const castSurge=()=>{const g=game.current;if(!g||g.ability>0||g.state!=="wave")return;g.aiming=!g.aiming;g.message=g.aiming?"Choose a kill zone on the road · tap Wild Surge again to cancel":"Wild Surge cancelled";sync()};
 
   useEffect(()=>{
     let raf=0,last=performance.now();
@@ -62,11 +62,12 @@ export default function Home(){
 
   const clickCanvas=(ev:React.MouseEvent<HTMLCanvasElement>)=>{
     const c=canvas.current,g=game.current;if(!c||!g)return;const r=c.getBoundingClientRect(),x=(ev.clientX-r.left)*W/r.width,y=(ev.clientY-r.top)*H/r.height;
+    if(g.aiming){g.aiming=false;g.ability=22;g.abilityShown=22;g.surgeMark={x,y,life:1.15};g.message="WILD SURGE · THE FOREST ANSWERS";g.shake=7;if(!g.muted)tone("upgrade");let caught=0;for(const enemy of g.enemies){if(!enemy.alive||dist(enemy,{x,y})>112)continue;caught++;enemy.root=Math.max(enemy.root,2.8);damage(g,enemy,36);burst(g,enemy.x,enemy.y,colors.nature,12)}g.texts.push({x,y:y-20,label:caught?`WILD SURGE · ${caught} HELD`:"THE ROOTS WAIT",life:1.2,color:"#e5ff9d"});sync();return}
     const ti=g.towers.findIndex((t:Tower)=>dist(t,{x,y})<31);if(ti>=0){g.selectedTower=ti;g.message=`Level ${g.towers[ti].level} ${names[g.towers[ti].element]} tower selected`;sync();return}
     const pi=pads.findIndex((p)=>Math.hypot(x-p[0],y-p[1])<34&&!g.towers.some((t:Tower)=>dist(t,{x:p[0],y:p[1]})<5));
     if(pi>=0){const e=selectedRef.current,cost=costs[e];if(g.gold>=cost){if(!g.muted)tone("build");g.gold-=cost;g.towers.push({x:pads[pi][0],y:pads[pi][1],element:e,level:1,cooldown:0,range:e==="storm"?142:154,id:g.nextId++,priority:"first"});g.selectedTower=g.towers.length-1;g.message=`${names[e]} tower bound to the old stone`;burst(g,pads[pi][0],pads[pi][1],colors[e],14)}else g.message="Not enough sunstone";sync()}
   };
-  const moveCanvas=(ev:React.MouseEvent<HTMLCanvasElement>)=>{const c=canvas.current,g=game.current;if(!c||!g)return;const r=c.getBoundingClientRect(),x=(ev.clientX-r.left)*W/r.width,y=(ev.clientY-r.top)*H/r.height;g.hover=pads.findIndex((p)=>Math.hypot(x-p[0],y-p[1])<36)};
+  const moveCanvas=(ev:React.MouseEvent<HTMLCanvasElement>)=>{const c=canvas.current,g=game.current;if(!c||!g)return;const r=c.getBoundingClientRect(),x=(ev.clientX-r.left)*W/r.width,y=(ev.clientY-r.top)*H/r.height;g.mouse={x,y};g.hover=pads.findIndex((p)=>Math.hypot(x-p[0],y-p[1])<36)};
   const t=game.current?.selectedTower>=0?game.current.towers[game.current.selectedTower]:null;
   const upgradeCost=t?75+t.level*55:0;
 
@@ -87,7 +88,7 @@ export default function Home(){
           {t&&<><div className="selection"><small>SELECTED</small><b style={{color:colors[t.element]}}>{names[t.element]} · LV {t.level}</b></div><button className="secondary" onClick={toggleTarget}>TARGET {t.priority.toUpperCase()}</button><button className="secondary" onClick={sell}>SELL</button><button className="secondary" disabled={t.level>=3||ui.gold<upgradeCost} onClick={upgrade}>{t.level>=3?"MAX LEVEL":`UPGRADE ◈${upgradeCost}`}</button></>}
           <button className="secondary speed" onClick={()=>{game.current.speed=game.current.speed===1?2:game.current.speed===2?0:1;game.current.message=game.current.speed===2?"Time quickens through the Wild":game.current.speed===0?"The battle is paused":"The Wild returns to its natural rhythm";sync()}}>{ui.speed===0?"PAUSED":`${ui.speed}× SPEED`}</button>
           <button className="secondary" aria-label={ui.muted?"Turn sound on":"Mute sound"} onClick={()=>{game.current.muted=!game.current.muted;game.current.message=game.current.muted?"Sound muted":"Sound restored";sync()}}>{ui.muted?"SOUND OFF":"SOUND ON"}</button>
-          <button className="surge" disabled={ui.state!=="wave"||ui.ability>0} onClick={castSurge}>{ui.ability>0?`WILD SURGE · ${Math.ceil(ui.ability)}s`:"WILD SURGE"}<span>Root every enemy</span></button>
+          <button className={`surge ${ui.aiming?"aiming":""}`} disabled={ui.state!=="wave"||ui.ability>0} onClick={castSurge}>{ui.ability>0?`WILD SURGE · ${Math.ceil(ui.ability)}s`:ui.aiming?"CANCEL SURGE":"WILD SURGE"}<span>{ui.aiming?"Choose a kill zone":"Place a root snare"}</span></button>
           <button className="wave" disabled={ui.state==="wave"||ui.state==="lost"||ui.state==="won"} onClick={startWave}>{ui.wave===0?"CALL FIRST WAVE":ui.wave>=6?"FINAL WAVE":"CALL NEXT WAVE"}<span>{ui.wave===0?"Scouts":ui.wave===1?"Scouts + Brutes":ui.wave===2?"Brutes + Wisps":ui.wave===3?"Scouts + Brutes":ui.wave===4?"Wisps + Brutes":"The Ashen Warden"}</span></button>
         </div>
       </footer>
@@ -99,6 +100,7 @@ export default function Home(){
 function burst(g:any,x:number,y:number,color:string,n=8){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=25+Math.random()*90;g.particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.35+Math.random()*.45,color,size:2+Math.random()*4})}}
 function damage(g:any,e:Enemy,amount:number){e.hp-=Math.max(2,amount-e.armor);if(e.hp<=0&&e.alive){e.alive=false;g.gold+=e.reward;g.score+=e.reward*10*(g.veteran?1.5:1);g.dirty=true;burst(g,e.x,e.y,e.kind==="warden"?"#ffc65c":"#dbe7b6",12);g.shake=e.kind==="warden"?10:2}}
 function update(g:any,dt:number,sync:()=>void){if(!g)return;g.texts??=[];g.time+=dt;g.shake=Math.max(0,g.shake-dt*20);g.flash=Math.max(0,g.flash-dt);
+  if(g.surgeMark){g.surgeMark.life-=dt;if(g.surgeMark.life<=0)g.surgeMark=null}
   if(g.ability>0){g.ability=Math.max(0,g.ability-dt);const shown=Math.ceil(g.ability);if(shown!==g.abilityShown){g.abilityShown=shown;g.dirty=true}}
   if(g.comboTimer>0){g.comboTimer-=dt;if(g.comboTimer<=0&&g.combo>0){g.combo=0;g.dirty=true}}
   if(g.state==="wave"){g.spawnClock+=dt;while(g.spawn.length&&g.spawn[0].at<=g.spawnClock){const s=g.spawn.shift(),hp=Math.round(s.hp*(g.veteran?1.3:1));g.enemies.push({x:path[0][0],y:path[0][1],waypoint:1,hp,maxHp:hp,speed:s.speed*(g.veteran?1.05:1),armor:(s.kind==="brute"?8:s.kind==="warden"?16:0)+(g.veteran?2:0),radius:s.kind==="warden"?23:s.kind==="brute"?16:11,burn:0,burnTick:0,chill:0,root:0,poison:0,alive:true,kind:s.kind,reward:s.reward})}}
@@ -152,6 +154,7 @@ function draw(canvas:HTMLCanvasElement|null,g:any,selected:Element){if(!canvas||
   c.shadowBlur=25;c.shadowColor="#7de6c4";c.fillStyle="#89efd0";c.beginPath();c.moveTo(960,288);c.lineTo(976,258);c.lineTo(990,288);c.lineTo(976,320);c.closePath();c.fill();c.shadowBlur=0;c.fillStyle="#d3fff0";c.font="11px Georgia";c.fillText("HEARTSTONE",925,340);
   pads.forEach((p,i)=>{const occupied=g.towers.some((t:Tower)=>dist(t,{x:p[0],y:p[1]})<5);if(occupied)return;const hover=g.hover===i;c.fillStyle="#453f32aa";c.beginPath();c.ellipse(p[0]+3,p[1]+8,29,10,0,0,Math.PI*2);c.fill();c.strokeStyle=hover?colors[selected]:"#d2be83";c.fillStyle=hover?colors[selected]+"66":"#776e57";c.lineWidth=hover?4:3;c.beginPath();c.arc(p[0],p[1],hover?31:27,0,Math.PI*2);c.fill();c.stroke();for(let s=0;s<8;s++){const a=s*Math.PI/4;c.strokeStyle="#4f493b";c.beginPath();c.moveTo(p[0]+Math.cos(a)*18,p[1]+Math.sin(a)*18);c.lineTo(p[0]+Math.cos(a)*27,p[1]+Math.sin(a)*27);c.stroke()}c.globalAlpha=.7;c.strokeStyle=hover?colors[selected]:"#d9ce9d";c.beginPath();c.arc(p[0],p[1],10+Math.sin(g.time*2+i)*2,0,Math.PI*2);c.stroke();c.globalAlpha=1});
   g.towers.forEach((t:Tower,i:number)=>towerArt(c,t,g.selectedTower===i,g.time));
+  const sigil=g.aiming?{...g.mouse,life:1}:g.surgeMark;if(sigil){const pulse=1+Math.sin(g.time*8)*.035;c.save();c.translate(sigil.x,sigil.y);c.scale(pulse,pulse);c.globalAlpha=g.aiming?.72:Math.min(.9,sigil.life);c.fillStyle="#79cf5430";c.strokeStyle="#d9ff8b";c.lineWidth=g.aiming?3:6;c.beginPath();c.arc(0,0,112,0,Math.PI*2);c.fill();c.stroke();c.rotate(g.time*.45);for(let i=0;i<8;i++){c.rotate(Math.PI/4);c.beginPath();c.moveTo(72,0);c.quadraticCurveTo(92,-15,108,0);c.quadraticCurveTo(92,15,72,0);c.stroke()}c.restore()}
   for(const e of g.enemies){
     if(!e.alive)continue;
     c.save();c.translate(0,Math.sin(g.time*9+e.x*.08)*2);

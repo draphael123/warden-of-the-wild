@@ -118,6 +118,16 @@ footer {
   cursor: not-allowed;
 }
 
+.surge.aiming {
+  background: linear-gradient(#b0dc61, #568a32);
+  box-shadow: inset 0 0 0 2px #315525, 0 4px 0 #1c3519, 0 0 22px #b4ef5e88;
+  animation: surge-call 1s ease-in-out infinite alternate;
+}
+
+@keyframes surge-call {
+  to { transform: translateY(-2px); filter: brightness(1.12); }
+}
+
 aside {
   padding: 5px 10px;
   background: #111f18aa;
