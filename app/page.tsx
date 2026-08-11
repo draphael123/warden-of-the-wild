@@ -27,6 +27,7 @@ const waves=[
 ];
 let audio:AudioContext|null=null;
 let emberForgeArt:HTMLImageElement|null=null;
+let frostSpireArt:HTMLImageElement|null=null;
 function tone(kind:"build"|"wave"|"upgrade"|"reaction"|"leak"|"surge"){
   try{audio??=new AudioContext();if(audio.state==="suspended")void audio.resume();const profiles={build:[260,520,.07,"sine"],wave:[120,220,.07,"sawtooth"],upgrade:[420,780,.07,"sine"],reaction:[330,990,.055,"triangle"],leak:[110,52,.08,"square"],surge:[170,680,.075,"triangle"]} as const,[from,to,volume,wave]=profiles[kind],now=audio.currentTime,osc=audio.createOscillator(),gain=audio.createGain();osc.connect(gain);gain.connect(audio.destination);osc.type=wave;osc.frequency.setValueAtTime(from,now);osc.frequency.exponentialRampToValueAtTime(to,now+.18);gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(volume,now+.015);gain.gain.exponentialRampToValueAtTime(.0001,now+.24);osc.start(now);osc.stop(now+.25)}catch{/* Sound remains optional. */}
 }
@@ -52,6 +53,7 @@ export default function Home(){
   },[]);
   useEffect(()=>{reset();try{setAutoWaves(localStorage.getItem("warden-auto-waves")==="true");if(localStorage.getItem("warden-tutorial-done")!=="true")setTutorialStep(1)}catch{/* Storage is optional. */}},[reset]);
   useEffect(()=>{const image=new Image();image.src="/assets/towers/ember-forge-l1-v3.png";image.onload=()=>{emberForgeArt=image};return()=>{if(emberForgeArt===image)emberForgeArt=null}},[]);
+  useEffect(()=>{const image=new Image();image.src="/assets/towers/frost-spire-l1.png";image.onload=()=>{frostSpireArt=image};return()=>{if(frostSpireArt===image)frostSpireArt=null}},[]);
 
   const sync=()=>{const g=game.current;if(g){const nextReady=g.state==="wave"&&!g.spawn.length&&g.enemies.some((e:Enemy)=>e.alive)&&g.wave<waves.length,rushBonus=nextReady?Math.min(30,g.enemies.filter((e:Enemy)=>e.alive).length*3):0;setUi({gold:g.gold,lives:g.lives,wave:g.wave,score:g.score,state:g.state,message:g.message,speed:g.speed,combo:g.combo,best:g.best,muted:g.muted,veteran:g.veteran,screenShake:g.screenShake,damageNumbers:g.damageNumbers,ability:g.ability,aiming:g.aiming,nextReady,rushBonus})}};
   const toggleSetting=(key:"muted"|"veteran"|"screenShake"|"damageNumbers",storage:string)=>{const g=game.current;if(!g)return;g[key]=!g[key];try{localStorage.setItem(storage,String(g[key]))}catch{/* Storage is optional. */}sync()};
@@ -183,6 +185,11 @@ function towerArt(c:CanvasRenderingContext2D,t:Tower,selected:boolean,time:numbe
     c.globalAlpha=.32+.3*breathe;c.shadowColor="#ff6a3d";c.shadowBlur=18+8*breathe;c.fillStyle="#ff9b4d";c.beginPath();c.ellipse(x,y-7,7+2*breathe,10+3*breathe,0,0,Math.PI*2);c.fill();c.shadowBlur=0;c.globalAlpha=1;
     for(let i=0;i<3;i++){const p=(smoke+i/3)%1,drift=Math.sin(time*1.7+i)*5;c.globalAlpha=(1-p)*.25;c.fillStyle="#ded7c1";c.beginPath();c.arc(x-17+drift*p,y-57-p*25,3+p*7,0,Math.PI*2);c.fill()}
     c.globalAlpha=1;if(recoil>.15){c.fillStyle="#ffd36c";for(let i=0;i<4;i++){const a=i*Math.PI/2+time*3;c.fillRect(x+Math.cos(a)*(13+recoil*8)-1,y-11+Math.sin(a)*(10+recoil*6)-1,3,3)}}towerElementalAura(c,t,time);c.restore();return
+  }
+  if(t.element==="frost"&&lv===1&&frostSpireArt?.complete){
+    c.fillStyle="#18313877";c.beginPath();c.ellipse(x+1,y+20,34,10,0,0,Math.PI*2);c.fill();
+    c.drawImage(frostSpireArt,120,15,1015,1210,x-42,y-77,84,100);
+    const pulse=.5+.5*Math.sin(time*3.4+t.id);c.globalAlpha=.18+.22*pulse;c.shadowColor="#6fe8f4";c.shadowBlur=18;c.fillStyle="#baf7fb";c.beginPath();c.moveTo(x,y-59);c.lineTo(x+7,y-36);c.lineTo(x,y-21);c.lineTo(x-7,y-36);c.closePath();c.fill();c.shadowBlur=0;c.globalAlpha=1;towerElementalAura(c,t,time);c.restore();return
   }
   c.fillStyle="#26342d55";c.beginPath();c.ellipse(x+5,y+22,27+lv*3,10+lv,0,0,Math.PI*2);c.fill();
   c.fillStyle="#746d59";c.strokeStyle="#40382c";c.lineWidth=3;c.beginPath();c.ellipse(x,y+9,25+lv*2,15+lv,0,0,Math.PI*2);c.fill();c.stroke();
