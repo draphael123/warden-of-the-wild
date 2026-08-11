@@ -24,3 +24,10 @@ Attribution is not required by CC0, but the creators and source pages are retain
 - Source: https://opengameart.org/node/23888
 - License: CC0 1.0 — https://creativecommons.org/publicdomain/zero/1.0/
 - `Forest_Ambience.mp3` is used as `forest-ambience.mp3`, a seamless low-volume woodland bed that begins after the player enters the level.
+
+## UI Sound Effects
+
+- Creator: Robin Lamb
+- Source: https://opengameart.org/content/ui-sound-effects-button-clicks-user-feedback-notifications
+- License: CC0 1.0 — https://creativecommons.org/publicdomain/zero/1.0/
+- `ding_deep.ogg`, `chimes.ogg`, and `negative_sound2.ogg` are used as the wave call, victory flourish, and defeat cue.

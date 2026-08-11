@@ -34,8 +34,8 @@ let hollowScoutArt:HTMLImageElement|null=null;
 let briarBruteArt:HTMLImageElement|null=null;
 let lifebloomWispArt:HTMLImageElement|null=null;
 let ashenWardenArt:HTMLImageElement|null=null;
-type Sfx=Element|"build"|"upgrade"|"hit"|"armor"|"death"|"boss"|"ui";
-const sfxPaths:Record<Sfx,string>={fire:"/audio/fire-shot.ogg",frost:"/audio/frost-shot.ogg",storm:"/audio/storm-shot.ogg",nature:"/audio/wild-shot.ogg",build:"/audio/build.ogg",upgrade:"/audio/upgrade.ogg",hit:"/audio/enemy-hit.ogg",armor:"/audio/armor-hit.ogg",death:"/audio/enemy-death.ogg",boss:"/audio/boss-roar.ogg",ui:"/audio/ui-click.ogg"};
+type Sfx=Element|"build"|"upgrade"|"hit"|"armor"|"death"|"boss"|"ui"|"wave"|"victory"|"defeat";
+const sfxPaths:Record<Sfx,string>={fire:"/audio/fire-shot.ogg",frost:"/audio/frost-shot.ogg",storm:"/audio/storm-shot.ogg",nature:"/audio/wild-shot.ogg",build:"/audio/build.ogg",upgrade:"/audio/upgrade.ogg",hit:"/audio/enemy-hit.ogg",armor:"/audio/armor-hit.ogg",death:"/audio/enemy-death.ogg",boss:"/audio/boss-roar.ogg",ui:"/audio/ui-click.ogg",wave:"/audio/wave-call.ogg",victory:"/audio/victory.ogg",defeat:"/audio/defeat.ogg"};
 const sfxCache:Partial<Record<Sfx,HTMLAudioElement>>={};
 function playSfx(kind:Sfx,muted:boolean,volume=.26,pitch=1){if(muted||typeof Audio==="undefined")return;try{const source=sfxCache[kind]??new Audio(sfxPaths[kind]);sfxCache[kind]=source;const voice=source.cloneNode(true) as HTMLAudioElement;voice.volume=volume;voice.playbackRate=Math.max(.7,Math.min(1.35,pitch*(.94+Math.random()*.12)));void voice.play().catch(()=>{})}catch{/* Audio remains optional. */}}
 let forestAmbience:HTMLAudioElement|null=null;
@@ -82,8 +82,8 @@ export default function Home(){
   // `startWave` reads the live game ref; restarting this timer on every render would prevent it firing.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   ,[autoWaves,ui.state,ui.wave]);
-  useEffect(()=>{if(ui.wave===6&&game.current)playSfx("boss",game.current.muted,.48,.82)},[ui.wave]);
-  useEffect(()=>{if(!game.current)return;if(ui.state==="won"){playSfx("upgrade",game.current.muted,.5,1.18);if(!game.current.muted)tone("upgrade")}else if(ui.state==="lost"){playSfx("death",game.current.muted,.5,.68);if(!game.current.muted)tone("leak")}},[ui.state]);
+  useEffect(()=>{if(!game.current||ui.wave<1)return;playSfx("wave",game.current.muted,.38,ui.wave===6?.82:1);if(ui.wave===6)playSfx("boss",game.current.muted,.48,.82)},[ui.wave]);
+  useEffect(()=>{if(!game.current)return;if(ui.state==="won"){playSfx("victory",game.current.muted,.52,1);if(!game.current.muted)tone("upgrade")}else if(ui.state==="lost"){playSfx("defeat",game.current.muted,.5,1);if(!game.current.muted)tone("leak")}},[ui.state]);
 
   const upgrade=()=>{const g=game.current;if(!g||g.selectedTower<0)return;const t=g.towers[g.selectedTower],price=75+t.level*55;if(t.level<3&&g.gold>=price){if(!g.muted)tone("upgrade");playSfx("upgrade",g.muted,.34,1+t.level*.05);g.gold-=price;t.level++;t.range+=12;g.message=`${names[t.element]} tower awakened to level ${t.level}`;burst(g,t.x,t.y,colors[t.element],16);sync()}};
   const sell=()=>{const g=game.current;if(!g||g.selectedTower<0)return;const t=g.towers[g.selectedTower];g.gold+=Math.floor((costs[t.element]+(t.level-1)*75)*.65);g.towers.splice(g.selectedTower,1);g.selectedTower=-1;g.message="Tower reclaimed. Its essence returns.";sync()};
