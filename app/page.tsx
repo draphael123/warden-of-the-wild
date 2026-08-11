@@ -158,6 +158,18 @@ function ruin(c:CanvasRenderingContext2D,x:number,y:number,s=1){
   c.save();c.translate(x,y);c.scale(s,s);c.fillStyle="#26372b55";c.beginPath();c.ellipse(3,19,27,8,0,0,Math.PI*2);c.fill();c.fillStyle="#77806a";c.strokeStyle="#3d473c";c.lineWidth=3;c.beginPath();c.moveTo(-23,15);c.lineTo(-20,-17);c.lineTo(-8,-22);c.lineTo(-5,4);c.lineTo(9,1);c.lineTo(12,-13);c.lineTo(23,-8);c.lineTo(24,17);c.closePath();c.fill();c.stroke();c.strokeStyle="#aeb58a";c.lineWidth=2;c.beginPath();c.moveTo(-18,-10);c.lineTo(-9,-13);c.moveTo(12,-5);c.lineTo(20,-2);c.stroke();c.strokeStyle="#527144";c.lineWidth=3;c.beginPath();c.moveTo(-20,-4);c.quadraticCurveTo(-6,8,-12,18);c.moveTo(8,2);c.quadraticCurveTo(2,12,14,17);c.stroke();c.restore();
 }
 function flowerPatch(c:CanvasRenderingContext2D,x:number,y:number,col:string){for(let i=0;i<5;i++){const dx=(i%3)*8-8,dy=Math.floor(i/3)*8-4;c.strokeStyle="#315f37";c.lineWidth=1.5;c.beginPath();c.moveTo(x+dx,y+dy+5);c.lineTo(x+dx,y+dy);c.stroke();c.fillStyle=col;for(let p=0;p<4;p++){const a=p*Math.PI/2;c.beginPath();c.arc(x+dx+Math.cos(a)*2.4,y+dy+Math.sin(a)*2.4,2.2,0,Math.PI*2);c.fill()}c.fillStyle="#f5d56a";c.beginPath();c.arc(x+dx,y+dy,1.4,0,Math.PI*2);c.fill()}}
+function towerElementalAura(c:CanvasRenderingContext2D,t:Tower,time:number){
+  const x=t.x,y=t.y,lv=t.level,phase=time*1.8+t.id;c.save();c.lineCap="round";c.lineJoin="round";
+  if(t.element==="fire"){
+    c.strokeStyle="#ffb54f";c.lineWidth=2;c.shadowColor="#ff6b38";c.shadowBlur=8;for(let i=0;i<3+lv;i++){const a=i*Math.PI*2/(3+lv)+phase*.35,r=27+lv*2;c.globalAlpha=.35+.25*Math.sin(phase*2+i);c.beginPath();c.moveTo(x+Math.cos(a)*r,y+12+Math.sin(a)*7);c.lineTo(x+Math.cos(a)*r*.72,y+4+Math.sin(a)*5);c.stroke()}for(let i=0;i<3;i++){const p=(time*.7+i/3+t.id*.11)%1,dx=Math.sin(phase+i)*7;c.globalAlpha=1-p;c.fillStyle=i?"#ff7b39":"#ffe077";c.beginPath();c.moveTo(x+dx-3,y-45-p*23);c.quadraticCurveTo(x+dx,y-54-p*29,x+dx+3,y-45-p*23);c.quadraticCurveTo(x+dx,y-39-p*18,x+dx-3,y-45-p*23);c.fill()}}
+  else if(t.element==="frost"){
+    c.strokeStyle="#c8f7ff";c.fillStyle="#8de8f7";c.shadowColor="#78dff4";c.shadowBlur=9;for(let i=0;i<4+lv;i++){const a=i*Math.PI*2/(4+lv)-phase*.18,r=24+lv*4;c.globalAlpha=.48+.2*Math.sin(phase*2+i);c.save();c.translate(x+Math.cos(a)*r,y-15+Math.sin(a)*r*.42);c.rotate(a+phase*.4);c.beginPath();c.moveTo(0,-5);c.lineTo(3,0);c.lineTo(0,5);c.lineTo(-3,0);c.closePath();c.fill();c.stroke();c.restore()}c.globalAlpha=.22;c.strokeStyle="#e1fbff";for(let i=0;i<3;i++){const yy=y+8+i*5+Math.sin(phase+i)*2;c.beginPath();c.moveTo(x-24-i*2,yy);c.quadraticCurveTo(x,yy-5,x+24+i*2,yy);c.stroke()}}
+  else if(t.element==="storm"){
+    c.strokeStyle="#e6ccff";c.shadowColor="#c38cff";c.shadowBlur=10;c.lineWidth=2;for(let i=0;i<3+lv;i++){const a=i*Math.PI*2/(3+lv)+phase*.12,r=25+lv*3,ex=x+Math.cos(a)*r,ey=y-18+Math.sin(a)*r*.45;c.globalAlpha=.3+.5*(.5+.5*Math.sin(phase*5+i*2));c.beginPath();c.moveTo(x,y-33-lv*3);c.lineTo((x+ex)/2+Math.sin(phase*7+i)*5,(y-33-lv*3+ey)/2);c.lineTo(ex,ey);c.stroke()}c.globalAlpha=.45;c.fillStyle="#f3e7ff";c.beginPath();c.arc(x,y-37-lv*3,5+Math.sin(phase*4)*2,0,Math.PI*2);c.fill()}
+  else{
+    c.strokeStyle="#9edc72";c.fillStyle="#bce982";c.shadowColor="#76c759";c.shadowBlur=7;for(let i=0;i<5+lv;i++){const a=i*Math.PI*2/(5+lv)+phase*.08,r=24+lv*3,wave=Math.sin(phase*2+i)*3;c.globalAlpha=.45+.22*Math.sin(phase+i);c.save();c.translate(x+Math.cos(a)*(r+wave),y-9+Math.sin(a)*(r*.52+wave));c.rotate(a+phase*.12);c.beginPath();c.moveTo(6,0);c.quadraticCurveTo(0,-5,-6,0);c.quadraticCurveTo(0,5,6,0);c.fill();c.stroke();c.restore()}for(let i=0;i<4;i++){const p=(time*.22+i/4+t.id*.09)%1;c.globalAlpha=(1-p)*.65;c.fillStyle="#e0f6a1";c.beginPath();c.arc(x-20+i*13+Math.sin(phase+i)*4,y-25-p*28,1.5+p,0,Math.PI*2);c.fill()}}
+  c.restore();
+}
 function towerArt(c:CanvasRenderingContext2D,t:Tower,selected:boolean,time:number){
   const col=colors[t.element];
   if(selected){c.fillStyle=col+"16";c.strokeStyle=col+"88";c.lineWidth=2;c.beginPath();c.arc(t.x,t.y,t.range,0,Math.PI*2);c.fill();c.stroke()}
@@ -170,7 +182,7 @@ function towerArt(c:CanvasRenderingContext2D,t:Tower,selected:boolean,time:numbe
     c.drawImage(emberForgeArt,10,70,1100,1190,x-45,y-75,90,98);
     c.globalAlpha=.32+.3*breathe;c.shadowColor="#ff6a3d";c.shadowBlur=18+8*breathe;c.fillStyle="#ff9b4d";c.beginPath();c.ellipse(x,y-7,7+2*breathe,10+3*breathe,0,0,Math.PI*2);c.fill();c.shadowBlur=0;c.globalAlpha=1;
     for(let i=0;i<3;i++){const p=(smoke+i/3)%1,drift=Math.sin(time*1.7+i)*5;c.globalAlpha=(1-p)*.25;c.fillStyle="#ded7c1";c.beginPath();c.arc(x-17+drift*p,y-57-p*25,3+p*7,0,Math.PI*2);c.fill()}
-    c.globalAlpha=1;if(recoil>.15){c.fillStyle="#ffd36c";for(let i=0;i<4;i++){const a=i*Math.PI/2+time*3;c.fillRect(x+Math.cos(a)*(13+recoil*8)-1,y-11+Math.sin(a)*(10+recoil*6)-1,3,3)}}c.restore();return
+    c.globalAlpha=1;if(recoil>.15){c.fillStyle="#ffd36c";for(let i=0;i<4;i++){const a=i*Math.PI/2+time*3;c.fillRect(x+Math.cos(a)*(13+recoil*8)-1,y-11+Math.sin(a)*(10+recoil*6)-1,3,3)}}towerElementalAura(c,t,time);c.restore();return
   }
   c.fillStyle="#26342d55";c.beginPath();c.ellipse(x+5,y+22,27+lv*3,10+lv,0,0,Math.PI*2);c.fill();
   c.fillStyle="#746d59";c.strokeStyle="#40382c";c.lineWidth=3;c.beginPath();c.ellipse(x,y+9,25+lv*2,15+lv,0,0,Math.PI*2);c.fill();c.stroke();
@@ -194,6 +206,7 @@ function towerArt(c:CanvasRenderingContext2D,t:Tower,selected:boolean,time:numbe
   c.shadowColor=col;c.shadowBlur=14;c.fillStyle=col;c.beginPath();c.arc(x,y-12-lv*2+bob,4+lv,0,Math.PI*2);c.fill();c.shadowBlur=0;c.strokeStyle="#342f27";c.lineWidth=2;c.stroke();
   if(lv>1){c.fillStyle="#e8c98d";c.beginPath();c.arc(x-8,y-10-lv*2,4,0,Math.PI*2);c.fill();c.fillStyle="#372c23";c.fillRect(x-11,y-15-lv*2,6,3)}
   for(let p=0;p<lv;p++){c.fillStyle="#f1df9c";c.beginPath();c.arc(x+(p-(lv-1)/2)*7,y+18,2.5,0,Math.PI*2);c.fill()}
+  towerElementalAura(c,t,time);
   c.restore();
 }
 
