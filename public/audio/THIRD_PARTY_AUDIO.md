@@ -17,3 +17,10 @@ The audio files in this directory are redistributed and used under Creative Comm
 - `metalClick.ogg` is used as `ui-click.ogg`.
 
 Attribution is not required by CC0, but the creators and source pages are retained here for provenance.
+
+## Forest Ambience
+
+- Creator: TinyWorlds
+- Source: https://opengameart.org/node/23888
+- License: CC0 1.0 — https://creativecommons.org/publicdomain/zero/1.0/
+- `Forest_Ambience.mp3` is used as `forest-ambience.mp3`, a seamless low-volume woodland bed that begins after the player enters the level.
