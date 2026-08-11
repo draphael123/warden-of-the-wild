@@ -264,7 +264,10 @@ function towerArt(c:CanvasRenderingContext2D,t:Tower,selected:boolean,time:numbe
 }
 
 function fallArt(c:CanvasRenderingContext2D,f:any){
-  const max=f.kind==="warden"?1.1:.65,p=1-f.life/max;c.save();c.translate(f.x+10*p,f.y+8*p);c.globalAlpha=Math.max(0,f.life/max);c.strokeStyle=f.kind==="wisp"?"#b8f5df":f.kind==="warden"?"#e39054":"#5b4b32";c.lineWidth=f.kind==="warden"?5:3;c.beginPath();c.ellipse(0,8,12+(f.kind==="warden"?18:5)*p,4+8*p,0,0,Math.PI*2);c.stroke();if(f.kind==="wisp"){c.fillStyle="#b8f5df";for(let i=0;i<5;i++){const a=i*Math.PI*.4+p*2;c.beginPath();c.arc(Math.cos(a)*(8+18*p),Math.sin(a)*(5+12*p),2,0,Math.PI*2);c.fill()}}else{c.rotate(p*.8);c.scale(1,Math.max(.18,1-p*.9));c.fillStyle=f.kind==="warden"?"#5d3028":f.kind==="brute"?"#665d44":"#435438";c.strokeStyle="#24251f";c.lineWidth=3;c.beginPath();c.roundRect(f.kind==="warden"?-24:-13,f.kind==="warden"?-22:-13,f.kind==="warden"?48:26,f.kind==="warden"?44:26,6);c.fill();c.stroke()}c.restore();
+  const max=f.kind==="warden"?1.1:.65,p=1-f.life/max,alpha=Math.max(0,f.life/max),art=f.kind==="warden"?ashenWardenArt:f.kind==="brute"?briarBruteArt:f.kind==="wisp"?lifebloomWispArt:hollowScoutArt;c.save();c.translate(f.x+10*p,f.y+8*p);c.globalAlpha=alpha;c.strokeStyle=f.kind==="wisp"?"#b8f5df":f.kind==="warden"?"#e39054":"#5b4b32";c.lineWidth=f.kind==="warden"?5:3;c.beginPath();c.ellipse(0,8,12+(f.kind==="warden"?18:5)*p,4+8*p,0,0,Math.PI*2);c.stroke();
+  if(art?.complete){c.rotate(p*(f.kind==="warden"?.42:.9));c.scale(1,Math.max(.12,1-p*.92));if(f.kind==="warden")c.drawImage(art,30,20,1200,1210,-42,-48,84,85);else if(f.kind==="brute")c.drawImage(art,45,65,1165,1110,-31,-31,62,59);else if(f.kind==="wisp")c.drawImage(art,205,20,820,1200,-19,-28,38,55);else c.drawImage(art,105,160,1020,915,-25,-24,50,45)}
+  else{c.rotate(p*.8);c.scale(1,Math.max(.18,1-p*.9));c.fillStyle=f.kind==="warden"?"#5d3028":f.kind==="brute"?"#665d44":"#435438";c.strokeStyle="#24251f";c.lineWidth=3;c.beginPath();c.roundRect(f.kind==="warden"?-24:-13,f.kind==="warden"?-22:-13,f.kind==="warden"?48:26,f.kind==="warden"?44:26,6);c.fill();c.stroke()}
+  if(f.kind==="wisp"){c.fillStyle="#b8f5df";for(let i=0;i<5;i++){const a=i*Math.PI*.4+p*2;c.beginPath();c.arc(Math.cos(a)*(8+18*p),Math.sin(a)*(5+12*p),2,0,Math.PI*2);c.fill()}}c.restore();
 }
 
 function enemyArt(c:CanvasRenderingContext2D,e:Enemy,time:number){
