@@ -19,6 +19,9 @@ test("server-renders Warden of the Wild", async () => {
   assert.match(html, /WARDEN OF THE WILD/);
   assert.match(html, /CALL FIRST WAVE/);
   assert.match(html, /THERMAL SHOCK/);
+  assert.match(html, /PERMAFROST/);
+  assert.match(html, /SUPERCONDUCT/);
+  assert.match(html, /WILDFIRE/);
   assert.match(html, /SETTINGS/);
   assert.match(html, /SOUND ON/);
   assert.match(html, /Place a root snare/);

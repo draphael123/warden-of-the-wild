@@ -171,6 +171,8 @@ aside {
   box-shadow: 0 0 7px #b8f5df;
 }
 
+.dot.frost { background:#5ed8f2; box-shadow:0 0 7px #5ed8f2; }
+
 button:focus-visible {
   outline: 3px solid #fff0a8;
   outline-offset: 3px;
