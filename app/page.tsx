@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type Element = "fire" | "frost" | "storm" | "nature";
-type Tower = { x:number; y:number; element:Element; level:number; cooldown:number; range:number; id:number; priority:"first"|"strong" };
+type Tower = { x:number; y:number; element:Element; level:number; cooldown:number; range:number; id:number; priority:"first"|"strong"; kick:number };
 type Enemy = { x:number; y:number; waypoint:number; hp:number; maxHp:number; speed:number; armor:number; radius:number; burn:number; burnTick:number; chill:number; root:number; poison:number; hit:number; alive:boolean; kind:string; reward:number; phase?:boolean };
 type Bolt = { x:number; y:number; tx:number; ty:number; color:string; life:number; kind:Element };
 type Particle = { x:number; y:number; vx:number; vy:number; life:number; color:string; size:number };
@@ -75,7 +75,7 @@ export default function Home(){
     if(g.aiming){g.aiming=false;g.ability=22;g.abilityShown=22;g.surgeMark={x,y,life:1.15};g.message="WILD SURGE · THE FOREST ANSWERS";g.shake=7;if(!g.muted)tone("upgrade");let caught=0;for(const enemy of g.enemies){if(!enemy.alive||dist(enemy,{x,y})>112)continue;caught++;enemy.root=Math.max(enemy.root,2.8);damage(g,enemy,36);burst(g,enemy.x,enemy.y,colors.nature,12)}g.texts.push({x,y:y-20,label:caught?`WILD SURGE · ${caught} HELD`:"THE ROOTS WAIT",life:1.2,color:"#e5ff9d"});sync();return}
     const ti=g.towers.findIndex((t:Tower)=>dist(t,{x,y})<31);if(ti>=0){g.selectedTower=ti;g.message=`Level ${g.towers[ti].level} ${names[g.towers[ti].element]} tower selected`;sync();return}
     const pi=pads.findIndex((p)=>Math.hypot(x-p[0],y-p[1])<34&&!g.towers.some((t:Tower)=>dist(t,{x:p[0],y:p[1]})<5));
-    if(pi>=0){const e=selectedRef.current,cost=costs[e];if(g.gold>=cost){if(!g.muted)tone("build");g.gold-=cost;g.towers.push({x:pads[pi][0],y:pads[pi][1],element:e,level:1,cooldown:0,range:e==="storm"?142:154,id:g.nextId++,priority:"first"});g.selectedTower=g.towers.length-1;g.message=`${names[e]} tower bound to the old stone`;burst(g,pads[pi][0],pads[pi][1],colors[e],14)}else g.message="Not enough sunstone";sync()}
+    if(pi>=0){const e=selectedRef.current,cost=costs[e];if(g.gold>=cost){if(!g.muted)tone("build");g.gold-=cost;g.towers.push({x:pads[pi][0],y:pads[pi][1],element:e,level:1,cooldown:0,range:e==="storm"?142:154,id:g.nextId++,priority:"first",kick:0});g.selectedTower=g.towers.length-1;g.message=`${names[e]} tower bound to the old stone`;burst(g,pads[pi][0],pads[pi][1],colors[e],14)}else g.message="Not enough sunstone";sync()}
   };
   const moveCanvas=(ev:React.MouseEvent<HTMLCanvasElement>)=>{const c=canvas.current,g=game.current;if(!c||!g)return;const r=c.getBoundingClientRect(),x=(ev.clientX-r.left)*W/r.width,y=(ev.clientY-r.top)*H/r.height;g.mouse={x,y};g.hover=pads.findIndex((p)=>Math.hypot(x-p[0],y-p[1])<36)};
   const t=game.current?.selectedTower>=0?game.current.towers[game.current.selectedTower]:null;
@@ -129,7 +129,7 @@ function update(g:any,dt:number,sync:()=>void){if(!g)return;g.texts??=[];g.falls
   if(g.state==="wave"){g.spawnClock+=dt;while(g.spawn.length&&g.spawn[0].at<=g.spawnClock){const s=g.spawn.shift(),hp=Math.round(s.hp*(g.veteran?1.3:1));g.enemies.push({x:path[0][0],y:path[0][1],waypoint:1,hp,maxHp:hp,speed:s.speed*(g.veteran?1.05:1),armor:(s.kind==="brute"?8:s.kind==="warden"?16:0)+(g.veteran?2:0),radius:s.kind==="warden"?25:s.kind==="brute"?18:s.kind==="wisp"?14:13,burn:0,burnTick:0,chill:0,root:0,poison:0,hit:0,alive:true,kind:s.kind,reward:s.reward});if(!g.spawn.length)g.dirty=true}}
   for(const e of g.enemies)e.hit=Math.max(0,e.hit-dt);
   for(const e of g.enemies){if(!e.alive)continue;e.burn=Math.max(0,e.burn-dt);e.poison=Math.max(0,e.poison-dt);e.chill=Math.max(0,e.chill-dt);e.root=Math.max(0,e.root-dt);if(e.kind==="wisp"&&e.burn<=0&&e.poison<=0&&e.hp<e.maxHp)e.hp=Math.min(e.maxHp,e.hp+9*dt);if(e.burn>0||e.poison>0){e.burnTick+=dt;if(e.burnTick>.25){damage(g,e,(e.burn>0?4:0)+(e.poison>0?2.5:0));e.burnTick=0}}if(!e.alive)continue;if(e.kind==="warden"&&!e.phase&&e.hp<e.maxHp*.5){e.phase=true;e.speed*=1.32;e.armor=5;g.message="THE WARDEN ENRAGES · ARMOR SHATTERED";g.shake=9;g.dirty=true;burst(g,e.x,e.y,"#ff985c",28)}const p=path[e.waypoint];if(!p)continue;const d=Math.hypot(p[0]-e.x,p[1]-e.y),spd=e.root>0?0:e.speed*(e.chill>0?.56:1);if(d<spd*dt+2){e.x=p[0];e.y=p[1];e.waypoint++;if(e.waypoint>=path.length){e.alive=false;g.lives-=e.kind==="warden"?8:e.kind==="brute"?2:1;g.shake=12;g.flash=.2;if(g.lives<=0){g.lives=0;g.state="lost";g.message="The Heartstone has fallen.";g.best=Math.max(g.best,g.score);try{localStorage.setItem("warden-best",String(g.best))}catch{/* Storage is optional. */}}sync()}}else{e.x+=(p[0]-e.x)/d*spd*dt;e.y+=(p[1]-e.y)/d*spd*dt}}
-  for(const t of g.towers){t.cooldown-=dt;if(t.cooldown>0)continue;const targets=g.enemies.filter((e:Enemy)=>e.alive&&dist(t,e)<t.range).sort((a:Enemy,b:Enemy)=>t.priority==="strong"?b.hp-a.hp:b.waypoint-a.waypoint);const e=targets[0];if(!e)continue;const power=(16+t.level*8)*(t.element==="storm"?.82:1);let reaction="";
+  for(const t of g.towers){t.kick=Math.max(0,(t.kick||0)-dt*5.5);t.cooldown-=dt;if(t.cooldown>0)continue;const targets=g.enemies.filter((e:Enemy)=>e.alive&&dist(t,e)<t.range).sort((a:Enemy,b:Enemy)=>t.priority==="strong"?b.hp-a.hp:b.waypoint-a.waypoint);const e=targets[0];if(!e)continue;t.kick=1;const power=(16+t.level*8)*(t.element==="storm"?.82:1);let reaction="";
     if(t.element==="fire"){if(e.chill>0){reaction="THERMAL SHOCK";damage(g,e,power*2.3);e.armor=Math.max(0,e.armor-5);e.chill=0;g.shake=4}else{damage(g,e,power);e.burn=2.3}if(e.poison>0){reaction="TOXIC FLAME";for(const x of targets.slice(0,4)){damage(g,x,power*.65);x.burn=1.4}}}
     if(t.element==="frost"){damage(g,e,power*.72);if(e.poison>0){reaction="PERMAFROST";e.poison=0;e.chill=3.4;e.root=Math.max(e.root,1.25);damage(g,e,power*.8)}else{e.chill=2.2;if(Math.random()<.12*t.level)e.root=.65}}
     if(t.element==="nature"){damage(g,e,power*.62);if(e.burn>0){reaction="WILDFIRE";for(const x of targets.slice(0,4)){damage(g,x,power*.48);x.burn=Math.max(x.burn,1.8);x.poison=Math.max(x.poison,1.5)}}e.poison=Math.max(e.poison,3);if(Math.random()<.2+.08*t.level)e.root=.8}
@@ -155,8 +155,15 @@ function flowerPatch(c:CanvasRenderingContext2D,x:number,y:number,col:string){fo
 function towerArt(c:CanvasRenderingContext2D,t:Tower,selected:boolean,time:number){
   const col=colors[t.element];
   if(selected){c.fillStyle=col+"16";c.strokeStyle=col+"88";c.lineWidth=2;c.beginPath();c.arc(t.x,t.y,t.range,0,Math.PI*2);c.fill();c.stroke()}
-  const x=t.x,y=t.y,lv=t.level,bob=Math.sin(time*3+t.id)*2;c.lineJoin="round";
-  if(t.element==="fire"&&lv===1&&emberForgeArt?.complete){c.fillStyle="#26342d55";c.beginPath();c.ellipse(x+5,y+25,38,12,0,0,Math.PI*2);c.fill();c.drawImage(emberForgeArt,x-46,y-82,92,108);return}
+  const x=t.x,y=t.y,lv=t.level,bob=Math.sin(time*3+t.id)*2,recoil=Math.sin(Math.min(1,t.kick||0)*Math.PI);c.lineJoin="round";
+  c.save();c.translate(x,y);c.scale(1+recoil*.045,1-recoil*.07);c.translate(-x,-y-recoil*3);
+  if(t.element==="fire"&&lv===1&&emberForgeArt?.complete){
+    const breathe=.5+.5*Math.sin(time*4.2+t.id),smoke=(time*.34+t.id*.17)%1;
+    c.fillStyle="#26342d55";c.beginPath();c.ellipse(x+5,y+25,38,12,0,0,Math.PI*2);c.fill();c.drawImage(emberForgeArt,x-46,y-82,92,108);
+    c.globalAlpha=.32+.3*breathe;c.shadowColor="#ff6a3d";c.shadowBlur=18+8*breathe;c.fillStyle="#ff9b4d";c.beginPath();c.ellipse(x,y-7,7+2*breathe,10+3*breathe,0,0,Math.PI*2);c.fill();c.shadowBlur=0;c.globalAlpha=1;
+    for(let i=0;i<3;i++){const p=(smoke+i/3)%1,drift=Math.sin(time*1.7+i)*5;c.globalAlpha=(1-p)*.25;c.fillStyle="#ded7c1";c.beginPath();c.arc(x-17+drift*p,y-57-p*25,3+p*7,0,Math.PI*2);c.fill()}
+    c.globalAlpha=1;if(recoil>.15){c.fillStyle="#ffd36c";for(let i=0;i<4;i++){const a=i*Math.PI/2+time*3;c.fillRect(x+Math.cos(a)*(13+recoil*8)-1,y-11+Math.sin(a)*(10+recoil*6)-1,3,3)}}c.restore();return
+  }
   c.fillStyle="#26342d55";c.beginPath();c.ellipse(x+5,y+22,27+lv*3,10+lv,0,0,Math.PI*2);c.fill();
   c.fillStyle="#746d59";c.strokeStyle="#40382c";c.lineWidth=3;c.beginPath();c.ellipse(x,y+9,25+lv*2,15+lv,0,0,Math.PI*2);c.fill();c.stroke();
   c.fillStyle="#b9aa83";c.fillRect(x-16-lv,y-13-lv*2,32+lv*2,26+lv*2);c.strokeStyle="#5b4c38";c.strokeRect(x-16-lv,y-13-lv*2,32+lv*2,26+lv*2);
@@ -179,6 +186,7 @@ function towerArt(c:CanvasRenderingContext2D,t:Tower,selected:boolean,time:numbe
   c.shadowColor=col;c.shadowBlur=14;c.fillStyle=col;c.beginPath();c.arc(x,y-12-lv*2+bob,4+lv,0,Math.PI*2);c.fill();c.shadowBlur=0;c.strokeStyle="#342f27";c.lineWidth=2;c.stroke();
   if(lv>1){c.fillStyle="#e8c98d";c.beginPath();c.arc(x-8,y-10-lv*2,4,0,Math.PI*2);c.fill();c.fillStyle="#372c23";c.fillRect(x-11,y-15-lv*2,6,3)}
   for(let p=0;p<lv;p++){c.fillStyle="#f1df9c";c.beginPath();c.arc(x+(p-(lv-1)/2)*7,y+18,2.5,0,Math.PI*2);c.fill()}
+  c.restore();
 }
 
 function fallArt(c:CanvasRenderingContext2D,f:any){
