@@ -51,7 +51,7 @@ export default function Home(){
     setUi({gold:260,lives:20,wave:0,score:0,state:"ready",message:"Build your first elemental tower.",speed,combo:0,best,muted,veteran,screenShake,damageNumbers,ability:0,aiming:false,nextReady:false,rushBonus:0});
   },[]);
   useEffect(()=>{reset();try{setAutoWaves(localStorage.getItem("warden-auto-waves")==="true");if(localStorage.getItem("warden-tutorial-done")!=="true")setTutorialStep(1)}catch{/* Storage is optional. */}},[reset]);
-  useEffect(()=>{const image=new Image();image.src="/assets/towers/ember-forge-l1-v2.png";image.onload=()=>{emberForgeArt=image};return()=>{if(emberForgeArt===image)emberForgeArt=null}},[]);
+  useEffect(()=>{const image=new Image();image.src="/assets/towers/ember-forge-l1-v3.png";image.onload=()=>{emberForgeArt=image};return()=>{if(emberForgeArt===image)emberForgeArt=null}},[]);
 
   const sync=()=>{const g=game.current;if(g){const nextReady=g.state==="wave"&&!g.spawn.length&&g.enemies.some((e:Enemy)=>e.alive)&&g.wave<waves.length,rushBonus=nextReady?Math.min(30,g.enemies.filter((e:Enemy)=>e.alive).length*3):0;setUi({gold:g.gold,lives:g.lives,wave:g.wave,score:g.score,state:g.state,message:g.message,speed:g.speed,combo:g.combo,best:g.best,muted:g.muted,veteran:g.veteran,screenShake:g.screenShake,damageNumbers:g.damageNumbers,ability:g.ability,aiming:g.aiming,nextReady,rushBonus})}};
   const toggleSetting=(key:"muted"|"veteran"|"screenShake"|"damageNumbers",storage:string)=>{const g=game.current;if(!g)return;g[key]=!g[key];try{localStorage.setItem(storage,String(g[key]))}catch{/* Storage is optional. */}sync()};
