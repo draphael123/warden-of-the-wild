@@ -176,34 +176,40 @@ function towerElementalAura(c:CanvasRenderingContext2D,t:Tower,time:number){
     c.strokeStyle="#9edc72";c.fillStyle="#bce982";c.shadowColor="#76c759";c.shadowBlur=7;for(let i=0;i<5+lv;i++){const a=i*Math.PI*2/(5+lv)+phase*.08,r=24+lv*3,wave=Math.sin(phase*2+i)*3;c.globalAlpha=.45+.22*Math.sin(phase+i);c.save();c.translate(x+Math.cos(a)*(r+wave),y-9+Math.sin(a)*(r*.52+wave));c.rotate(a+phase*.12);c.beginPath();c.moveTo(6,0);c.quadraticCurveTo(0,-5,-6,0);c.quadraticCurveTo(0,5,6,0);c.fill();c.stroke();c.restore()}for(let i=0;i<4;i++){const p=(time*.22+i/4+t.id*.09)%1;c.globalAlpha=(1-p)*.65;c.fillStyle="#e0f6a1";c.beginPath();c.arc(x-20+i*13+Math.sin(phase+i)*4,y-25-p*28,1.5+p,0,Math.PI*2);c.fill()}}
   c.restore();
 }
+function towerUpgradeCrown(c:CanvasRenderingContext2D,t:Tower,time:number){if(t.level<2)return;const x=t.x,y=t.y,lv=t.level,pulse=.5+.5*Math.sin(time*4+t.id);c.save();c.lineJoin="round";c.lineCap="round";
+  if(t.element==="fire"){c.fillStyle="#ff7840";c.strokeStyle="#552d25";c.lineWidth=2;for(const dx of [-25,25]){c.beginPath();c.moveTo(x+dx-5,y-27);c.quadraticCurveTo(x+dx,y-48-pulse*7,x+dx+5,y-27);c.quadraticCurveTo(x+dx,y-17,x+dx-5,y-27);c.fill();c.stroke()}if(lv===3){c.fillStyle="#ffe080";c.beginPath();c.moveTo(x-6,y-51);c.quadraticCurveTo(x,y-70-pulse*8,x+6,y-51);c.quadraticCurveTo(x,y-38,x-6,y-51);c.fill()}}
+  else if(t.element==="frost"){c.fillStyle="#bff6fa";c.strokeStyle="#397e91";c.lineWidth=2;for(const [dx,dy] of [[-29,-24],[29,-26],[-18,-58],[19,-61]].slice(0,lv+1)){c.beginPath();c.moveTo(x+dx,y+dy-8-pulse*3);c.lineTo(x+dx+5,y+dy+3);c.lineTo(x+dx-4,y+dy+5);c.closePath();c.fill();c.stroke()}}
+  else if(t.element==="storm"){c.strokeStyle="#ead5ff";c.shadowColor="#c991ff";c.shadowBlur=10;c.lineWidth=2.5;for(let i=0;i<lv+1;i++){const a=i*Math.PI*2/(lv+1)+time*.6,r=31+lv*3;c.beginPath();c.moveTo(x,y-43);c.lineTo(x+Math.cos(a)*r*.55,y-43+Math.sin(a)*11);c.lineTo(x+Math.cos(a)*r,y-28+Math.sin(a)*17);c.stroke()}}
+  else{c.fillStyle=lv===3?"#f3dc83":"#d0eb83";c.strokeStyle="#496c35";c.lineWidth=1.5;for(let i=0;i<3+lv;i++){const a=i*Math.PI*2/(3+lv)+time*.18,r=30+lv*2;c.save();c.translate(x+Math.cos(a)*r,y-30+Math.sin(a)*15);c.rotate(a);for(let p=0;p<5;p++){c.rotate(Math.PI*2/5);c.beginPath();c.ellipse(4,0,4,2,0,0,Math.PI*2);c.fill();c.stroke()}c.restore()}}
+  c.restore();}
 function towerArt(c:CanvasRenderingContext2D,t:Tower,selected:boolean,time:number){
   const col=colors[t.element];
   if(selected){c.fillStyle=col+"16";c.strokeStyle=col+"88";c.lineWidth=2;c.beginPath();c.arc(t.x,t.y,t.range,0,Math.PI*2);c.fill();c.stroke()}
   const x=t.x,y=t.y,lv=t.level,bob=Math.sin(time*3+t.id)*2,recoil=Math.sin(Math.min(1,t.kick||0)*Math.PI);c.lineJoin="round";
   c.save();c.translate(x,y);c.scale(1+recoil*.045,1-recoil*.07);c.translate(-x,-y-recoil*3);
-  if(t.element==="fire"&&lv===1&&emberForgeArt?.complete){
+  if(t.element==="fire"&&emberForgeArt?.complete){
     const breathe=.5+.5*Math.sin(time*4.2+t.id),smoke=(time*.34+t.id*.17)%1;
     c.fillStyle="#18271f77";c.beginPath();c.ellipse(x+2,y+20,35,10,0,0,Math.PI*2);c.fill();
     // Crop the chroma-key source padding so the masonry visibly meets its pad.
     c.drawImage(emberForgeArt,10,70,1100,1190,x-45,y-75,90,98);
     c.globalAlpha=.32+.3*breathe;c.shadowColor="#ff6a3d";c.shadowBlur=18+8*breathe;c.fillStyle="#ff9b4d";c.beginPath();c.ellipse(x,y-7,7+2*breathe,10+3*breathe,0,0,Math.PI*2);c.fill();c.shadowBlur=0;c.globalAlpha=1;
     for(let i=0;i<3;i++){const p=(smoke+i/3)%1,drift=Math.sin(time*1.7+i)*5;c.globalAlpha=(1-p)*.25;c.fillStyle="#ded7c1";c.beginPath();c.arc(x-17+drift*p,y-57-p*25,3+p*7,0,Math.PI*2);c.fill()}
-    c.globalAlpha=1;if(recoil>.15){c.fillStyle="#ffd36c";for(let i=0;i<4;i++){const a=i*Math.PI/2+time*3;c.fillRect(x+Math.cos(a)*(13+recoil*8)-1,y-11+Math.sin(a)*(10+recoil*6)-1,3,3)}}towerElementalAura(c,t,time);c.restore();return
+    c.globalAlpha=1;if(recoil>.15){c.fillStyle="#ffd36c";for(let i=0;i<4;i++){const a=i*Math.PI/2+time*3;c.fillRect(x+Math.cos(a)*(13+recoil*8)-1,y-11+Math.sin(a)*(10+recoil*6)-1,3,3)}}towerElementalAura(c,t,time);towerUpgradeCrown(c,t,time);c.restore();return
   }
-  if(t.element==="frost"&&lv===1&&frostSpireArt?.complete){
+  if(t.element==="frost"&&frostSpireArt?.complete){
     c.fillStyle="#18313877";c.beginPath();c.ellipse(x+1,y+20,34,10,0,0,Math.PI*2);c.fill();
     c.drawImage(frostSpireArt,120,15,1015,1210,x-42,y-77,84,100);
-    const pulse=.5+.5*Math.sin(time*3.4+t.id);c.globalAlpha=.18+.22*pulse;c.shadowColor="#6fe8f4";c.shadowBlur=18;c.fillStyle="#baf7fb";c.beginPath();c.moveTo(x,y-59);c.lineTo(x+7,y-36);c.lineTo(x,y-21);c.lineTo(x-7,y-36);c.closePath();c.fill();c.shadowBlur=0;c.globalAlpha=1;towerElementalAura(c,t,time);c.restore();return
+    const pulse=.5+.5*Math.sin(time*3.4+t.id);c.globalAlpha=.18+.22*pulse;c.shadowColor="#6fe8f4";c.shadowBlur=18;c.fillStyle="#baf7fb";c.beginPath();c.moveTo(x,y-59);c.lineTo(x+7,y-36);c.lineTo(x,y-21);c.lineTo(x-7,y-36);c.closePath();c.fill();c.shadowBlur=0;c.globalAlpha=1;towerElementalAura(c,t,time);towerUpgradeCrown(c,t,time);c.restore();return
   }
-  if(t.element==="storm"&&lv===1&&stormBastionArt?.complete){
+  if(t.element==="storm"&&stormBastionArt?.complete){
     c.fillStyle="#1d203077";c.beginPath();c.ellipse(x+1,y+20,33,10,0,0,Math.PI*2);c.fill();
     c.drawImage(stormBastionArt,140,20,920,1215,x-38,y-78,76,101);
-    const pulse=.5+.5*Math.sin(time*5.2+t.id);c.globalAlpha=.2+.3*pulse;c.shadowColor="#d4a8f4";c.shadowBlur=20;c.fillStyle="#d9b8f2";c.beginPath();c.moveTo(x,y-48);c.lineTo(x+8,y-35);c.lineTo(x,y-22);c.lineTo(x-8,y-35);c.closePath();c.fill();c.shadowBlur=0;c.globalAlpha=1;towerElementalAura(c,t,time);c.restore();return
+    const pulse=.5+.5*Math.sin(time*5.2+t.id);c.globalAlpha=.2+.3*pulse;c.shadowColor="#d4a8f4";c.shadowBlur=20;c.fillStyle="#d9b8f2";c.beginPath();c.moveTo(x,y-48);c.lineTo(x+8,y-35);c.lineTo(x,y-22);c.lineTo(x-8,y-35);c.closePath();c.fill();c.shadowBlur=0;c.globalAlpha=1;towerElementalAura(c,t,time);towerUpgradeCrown(c,t,time);c.restore();return
   }
-  if(t.element==="nature"&&lv===1&&wildLodgeArt?.complete){
+  if(t.element==="nature"&&wildLodgeArt?.complete){
     c.fillStyle="#20311c77";c.beginPath();c.ellipse(x+1,y+20,35,10,0,0,Math.PI*2);c.fill();
     c.drawImage(wildLodgeArt,120,40,1010,1180,x-42,y-75,84,98);
-    const pulse=.5+.5*Math.sin(time*3+t.id);c.globalAlpha=.16+.3*pulse;c.shadowColor="#d7e66d";c.shadowBlur=18;c.fillStyle="#e1ed82";c.beginPath();c.moveTo(x,y-51);c.quadraticCurveTo(x+9,y-40,x,y-25);c.quadraticCurveTo(x-9,y-40,x,y-51);c.fill();c.shadowBlur=0;c.globalAlpha=1;towerElementalAura(c,t,time);c.restore();return
+    const pulse=.5+.5*Math.sin(time*3+t.id);c.globalAlpha=.16+.3*pulse;c.shadowColor="#d7e66d";c.shadowBlur=18;c.fillStyle="#e1ed82";c.beginPath();c.moveTo(x,y-51);c.quadraticCurveTo(x+9,y-40,x,y-25);c.quadraticCurveTo(x-9,y-40,x,y-51);c.fill();c.shadowBlur=0;c.globalAlpha=1;towerElementalAura(c,t,time);towerUpgradeCrown(c,t,time);c.restore();return
   }
   c.fillStyle="#26342d55";c.beginPath();c.ellipse(x+5,y+22,27+lv*3,10+lv,0,0,Math.PI*2);c.fill();
   c.fillStyle="#746d59";c.strokeStyle="#40382c";c.lineWidth=3;c.beginPath();c.ellipse(x,y+9,25+lv*2,15+lv,0,0,Math.PI*2);c.fill();c.stroke();
