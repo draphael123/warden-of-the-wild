@@ -221,3 +221,68 @@ button:focus-visible {
 }
 
 @media(max-width:700px){.menu-overlay{padding:8px}.folio{padding:24px 18px}.guide-grid{grid-template-columns:1fr}.level-card{grid-template-columns:42px 1fr}.level-card button,.level-card em{grid-column:2;justify-self:start}header nav{flex-wrap:wrap}}
+
+/* Illustrated frame language: carved corners, parchment grain and inset elemental seals. */
+.stage-wrap::before,
+.stage-wrap::after {
+  content:"";
+  position:absolute;
+  z-index:4;
+  width:34px;
+  height:34px;
+  pointer-events:none;
+  border-color:#d1b776;
+  filter:drop-shadow(0 2px 0 #24180d);
+}
+.stage-wrap::before { inset:7px auto auto 7px; border-left:4px solid; border-top:4px solid; border-radius:10px 0 0; }
+.stage-wrap::after { inset:7px 7px auto auto; border-right:4px solid; border-top:4px solid; border-radius:0 10px 0 0; }
+
+.intro::before {
+  content:"";
+  position:absolute;
+  inset:9% 18%;
+  z-index:-1;
+  background:linear-gradient(105deg,#17291fe6,#0b1713f2 52%,#182a20e6);
+  border:3px solid #7f7048;
+  box-shadow:inset 0 0 0 2px #182019,inset 0 0 45px #0007,0 18px 45px #0009;
+  clip-path:polygon(3% 0,97% 0,100% 8%,100% 92%,97% 100%,3% 100%,0 92%,0 8%);
+}
+
+.element { position:relative; overflow:hidden; }
+.element::after {
+  content:"";
+  position:absolute;
+  inset:4px;
+  border:1px solid color-mix(in srgb,var(--e) 20%,transparent);
+  clip-path:polygon(0 0,20px 0,0 20px,0 100%,100% 100%,100% 0);
+  pointer-events:none;
+}
+.element i {
+  display:grid;
+  place-items:center;
+  flex:0 0 34px;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--e) 25%,#25271f),#201f18 68%);
+  border:2px solid color-mix(in srgb,var(--e) 62%,#6c6548);
+  box-shadow:inset 0 0 0 2px #171812,0 2px 0 #15140f,0 0 12px color-mix(in srgb,var(--e) 24%,transparent);
+}
+.element:active,.secondary:active,.surge:active,.wave:active { transform:translateY(2px); box-shadow:inset 0 0 0 1px #171812,0 1px 0 #17140f; }
+
+.folio {
+  background:
+    repeating-linear-gradient(7deg,#6d573311 0 1px,transparent 1px 7px),
+    linear-gradient(100deg,#c8ad70,#f1dfaa 8%,#ead59b 92%,#b7965b);
+}
+.folio h2::after {
+  content:"";
+  display:block;
+  width:84px;
+  height:5px;
+  margin-top:8px;
+  background:linear-gradient(90deg,#76562d,transparent);
+  clip-path:polygon(0 40%,78% 40%,84% 0,100% 50%,84% 100%,78% 60%,0 60%);
+}
+
+@media(max-width:700px){.intro::before{inset:7% 5%}.element i{flex-basis:30px;width:30px;height:30px}.stage-wrap::before,.stage-wrap::after{width:22px;height:22px}}
