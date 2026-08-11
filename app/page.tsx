@@ -30,6 +30,7 @@ let emberForgeArt:HTMLImageElement|null=null;
 let frostSpireArt:HTMLImageElement|null=null;
 let stormBastionArt:HTMLImageElement|null=null;
 let wildLodgeArt:HTMLImageElement|null=null;
+let hollowScoutArt:HTMLImageElement|null=null;
 function tone(kind:"build"|"wave"|"upgrade"|"reaction"|"leak"|"surge"){
   try{audio??=new AudioContext();if(audio.state==="suspended")void audio.resume();const profiles={build:[260,520,.07,"sine"],wave:[120,220,.07,"sawtooth"],upgrade:[420,780,.07,"sine"],reaction:[330,990,.055,"triangle"],leak:[110,52,.08,"square"],surge:[170,680,.075,"triangle"]} as const,[from,to,volume,wave]=profiles[kind],now=audio.currentTime,osc=audio.createOscillator(),gain=audio.createGain();osc.connect(gain);gain.connect(audio.destination);osc.type=wave;osc.frequency.setValueAtTime(from,now);osc.frequency.exponentialRampToValueAtTime(to,now+.18);gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(volume,now+.015);gain.gain.exponentialRampToValueAtTime(.0001,now+.24);osc.start(now);osc.stop(now+.25)}catch{/* Sound remains optional. */}
 }
@@ -58,6 +59,7 @@ export default function Home(){
   useEffect(()=>{const image=new Image();image.src="/assets/towers/frost-spire-l1.png";image.onload=()=>{frostSpireArt=image};return()=>{if(frostSpireArt===image)frostSpireArt=null}},[]);
   useEffect(()=>{const image=new Image();image.src="/assets/towers/storm-bastion-l1-v2.png";image.onload=()=>{stormBastionArt=image};return()=>{if(stormBastionArt===image)stormBastionArt=null}},[]);
   useEffect(()=>{const image=new Image();image.src="/assets/towers/wild-lodge-l1.png";image.onload=()=>{wildLodgeArt=image};return()=>{if(wildLodgeArt===image)wildLodgeArt=null}},[]);
+  useEffect(()=>{const image=new Image();image.src="/assets/enemies/hollow-scout.png";image.onload=()=>{hollowScoutArt=image};return()=>{if(hollowScoutArt===image)hollowScoutArt=null}},[]);
 
   const sync=()=>{const g=game.current;if(g){const nextReady=g.state==="wave"&&!g.spawn.length&&g.enemies.some((e:Enemy)=>e.alive)&&g.wave<waves.length,rushBonus=nextReady?Math.min(30,g.enemies.filter((e:Enemy)=>e.alive).length*3):0;setUi({gold:g.gold,lives:g.lives,wave:g.wave,score:g.score,state:g.state,message:g.message,speed:g.speed,combo:g.combo,best:g.best,muted:g.muted,veteran:g.veteran,screenShake:g.screenShake,damageNumbers:g.damageNumbers,ability:g.ability,aiming:g.aiming,nextReady,rushBonus})}};
   const toggleSetting=(key:"muted"|"veteran"|"screenShake"|"damageNumbers",storage:string)=>{const g=game.current;if(!g)return;g[key]=!g[key];try{localStorage.setItem(storage,String(g[key]))}catch{/* Storage is optional. */}sync()};
@@ -248,7 +250,8 @@ function enemyArt(c:CanvasRenderingContext2D,e:Enemy,time:number){
     if(e.burn<=0&&e.poison<=0){c.save();c.rotate(time*1.7);c.strokeStyle="#b8f5df";c.lineWidth=2;c.globalAlpha=.55+.2*Math.sin(time*5);c.setLineDash([5,5]);c.beginPath();c.arc(0,0,e.radius+8,0,Math.PI*2);c.stroke();c.restore()}
     c.shadowColor="#a6f2e8";c.shadowBlur=14;c.fillStyle="#3a7080";c.strokeStyle=ink;c.lineWidth=2;c.beginPath();c.moveTo(0,-e.radius-3);c.quadraticCurveTo(e.radius+5,-2,3,e.radius+6);c.quadraticCurveTo(-e.radius-5,2,0,-e.radius-3);c.fill();c.stroke();c.shadowBlur=0;c.fillStyle="#d5fff4";c.beginPath();c.arc(-3,-2,2.5,0,Math.PI*2);c.arc(4,-2,2.5,0,Math.PI*2);c.fill();
   }else if(e.kind==="scout"){
-    c.strokeStyle=ink;c.lineWidth=4;c.beginPath();c.moveTo(-5,8);c.lineTo(-8+step*3,17);c.moveTo(5,8);c.lineTo(8-step*3,17);c.stroke();c.fillStyle="#46573b";c.beginPath();c.ellipse(0,1,11,14,0,0,Math.PI*2);c.fill();c.stroke();c.fillStyle="#35492f";c.beginPath();c.moveTo(-8,-7);c.lineTo(-18,-15);c.lineTo(-11,0);c.moveTo(8,-7);c.lineTo(18,-15);c.lineTo(11,0);c.fill();c.fillStyle="#f5dc65";c.fillRect(-6,-4,4,3);c.fillRect(2,-4,4,3);c.strokeStyle="#c39b58";c.lineWidth=3;c.beginPath();c.moveTo(-11,1);c.lineTo(-18,9+step*2);c.stroke();
+    if(hollowScoutArt?.complete){c.save();c.scale(e.facing,1);c.drawImage(hollowScoutArt,105,160,1020,915,-25,-24,50,45);c.restore()}
+    else{c.strokeStyle=ink;c.lineWidth=4;c.beginPath();c.moveTo(-5,8);c.lineTo(-8+step*3,17);c.moveTo(5,8);c.lineTo(8-step*3,17);c.stroke();c.fillStyle="#46573b";c.beginPath();c.ellipse(0,1,11,14,0,0,Math.PI*2);c.fill();c.stroke();c.fillStyle="#35492f";c.beginPath();c.moveTo(-8,-7);c.lineTo(-18,-15);c.lineTo(-11,0);c.moveTo(8,-7);c.lineTo(18,-15);c.lineTo(11,0);c.fill();c.fillStyle="#f5dc65";c.fillRect(-6,-4,4,3);c.fillRect(2,-4,4,3);c.strokeStyle="#c39b58";c.lineWidth=3;c.beginPath();c.moveTo(-11,1);c.lineTo(-18,9+step*2);c.stroke()}
   }else if(e.kind==="brute"){
     c.strokeStyle=ink;c.lineWidth=5;c.beginPath();c.moveTo(-8,11);c.lineTo(-11+step*2,22);c.moveTo(8,11);c.lineTo(11-step*2,22);c.stroke();c.fillStyle="#5b543d";c.beginPath();c.roundRect(-16,-16,32,33,7);c.fill();c.stroke();c.fillStyle=e.armor>5?"#85785e":"#5f5746";c.beginPath();c.moveTo(-20,-11);c.lineTo(-7,-19);c.lineTo(3,5);c.lineTo(-15,12);c.closePath();c.fill();c.stroke();c.fillStyle="#d7bd7a";c.fillRect(-5,-7,4,4);c.fillRect(4,-7,4,4);c.strokeStyle="#c7b076";c.lineWidth=4;c.beginPath();c.moveTo(15,-5);c.lineTo(23,8+step);c.stroke();
   }else{
