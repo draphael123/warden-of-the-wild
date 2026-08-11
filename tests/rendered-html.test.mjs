@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 async function render() {
@@ -22,11 +23,21 @@ test("server-renders Warden of the Wild", async () => {
   assert.match(html, /PERMAFROST/);
   assert.match(html, /SUPERCONDUCT/);
   assert.match(html, /WILDFIRE/);
+  assert.match(html, /OVERGROWTH ARC/);
+  assert.match(html, /TOXIC FLAME/);
   assert.match(html, /SETTINGS/);
   assert.match(html, /SOUND ON/);
+  assert.match(html, /AUTO WAVES/);
   assert.match(html, /Place a root snare/);
   assert.match(html, /Lifebloom/);
   assert.match(html, /FIELD GUIDE/);
   assert.match(html, /CHOOSE LEVEL/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/);
+
+  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(source, /Screen shake/);
+  assert.match(source, /Damage numbers/);
+  assert.match(source, /WARDEN&apos;S BRIEF/);
+  assert.match(source, /warden-tutorial-done/);
+  assert.match(source, /warden-auto-waves/);
 });
