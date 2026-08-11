@@ -25,6 +25,7 @@ const waves=[
   [{kind:"warden",count:1,gap:1,hp:3500,speed:30,reward:180},{kind:"scout",count:12,gap:.34,hp:190,speed:86,reward:15}],
 ];
 let audio:AudioContext|null=null;
+let emberForgeArt:HTMLImageElement|null=null;
 function tone(kind:"build"|"wave"|"upgrade"){
   try{audio??=new AudioContext();const now=audio.currentTime,osc=audio.createOscillator(),gain=audio.createGain();osc.connect(gain);gain.connect(audio.destination);osc.type=kind==="wave"?"sawtooth":"sine";osc.frequency.setValueAtTime(kind==="build"?260:kind==="upgrade"?420:120,now);osc.frequency.exponentialRampToValueAtTime(kind==="build"?520:kind==="upgrade"?780:220,now+.18);gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.07,now+.015);gain.gain.exponentialRampToValueAtTime(.0001,now+.24);osc.start(now);osc.stop(now+.25)}catch{/* Sound remains optional. */}
 }
@@ -46,6 +47,7 @@ export default function Home(){
     setUi({gold:260,lives:20,wave:0,score:0,state:"ready",message:"Build your first elemental tower.",speed:1,combo:0,best,muted:false,veteran:false,ability:0,aiming:false,nextReady:false,rushBonus:0});
   },[]);
   useEffect(()=>reset(),[reset]);
+  useEffect(()=>{const image=new Image();image.src="/assets/towers/ember-forge-l1.png";image.onload=()=>{emberForgeArt=image};return()=>{if(emberForgeArt===image)emberForgeArt=null}},[]);
 
   const sync=()=>{const g=game.current;if(g){const nextReady=g.state==="wave"&&!g.spawn.length&&g.enemies.some((e:Enemy)=>e.alive)&&g.wave<waves.length,rushBonus=nextReady?Math.min(30,g.enemies.filter((e:Enemy)=>e.alive).length*3):0;setUi({gold:g.gold,lives:g.lives,wave:g.wave,score:g.score,state:g.state,message:g.message,speed:g.speed,combo:g.combo,best:g.best,muted:g.muted,veteran:g.veteran,ability:g.ability,aiming:g.aiming,nextReady,rushBonus})}};
   const startWave=()=>{const g=game.current;if(!g||g.state==="lost"||g.state==="won"||g.wave>=waves.length)return;const early=g.state==="wave";if(early&&g.spawn.length)return;const bonus=early?Math.min(30,g.enemies.filter((e:Enemy)=>e.alive).length*3):0;if(!g.muted)tone("wave");g.gold+=bonus;g.score+=bonus*5;g.wave++;g.state="wave";const warning=g.wave===6?"THE ASHEN WARDEN APPROACHES":g.wave===3?"LIFEBLOOM WISPS · BURN OR POISON STOPS THEIR HEALING":"Wave "+g.wave+" breaks from the Hollow";g.message=warning+(early?` · RUSH BONUS ◈${bonus}`:"");g.spawn=[];let delay=.5;waves[g.wave-1].forEach(group=>{for(let i=0;i<group.count;i++){g.spawn.push({...group,at:delay});delay+=group.gap}delay+=1});g.spawnClock=0;sync()};
@@ -146,6 +148,7 @@ function towerArt(c:CanvasRenderingContext2D,t:Tower,selected:boolean,time:numbe
   const col=colors[t.element];
   if(selected){c.fillStyle=col+"16";c.strokeStyle=col+"88";c.lineWidth=2;c.beginPath();c.arc(t.x,t.y,t.range,0,Math.PI*2);c.fill();c.stroke()}
   const x=t.x,y=t.y,lv=t.level,bob=Math.sin(time*3+t.id)*2;c.lineJoin="round";
+  if(t.element==="fire"&&lv===1&&emberForgeArt?.complete){c.fillStyle="#26342d55";c.beginPath();c.ellipse(x+5,y+25,38,12,0,0,Math.PI*2);c.fill();c.drawImage(emberForgeArt,x-46,y-82,92,108);return}
   c.fillStyle="#26342d55";c.beginPath();c.ellipse(x+5,y+22,27+lv*3,10+lv,0,0,Math.PI*2);c.fill();
   c.fillStyle="#746d59";c.strokeStyle="#40382c";c.lineWidth=3;c.beginPath();c.ellipse(x,y+9,25+lv*2,15+lv,0,0,Math.PI*2);c.fill();c.stroke();
   c.fillStyle="#b9aa83";c.fillRect(x-16-lv,y-13-lv*2,32+lv*2,26+lv*2);c.strokeStyle="#5b4c38";c.strokeRect(x-16-lv,y-13-lv*2,32+lv*2,26+lv*2);
