@@ -51,7 +51,7 @@ export default function Home(){
     setUi({gold:260,lives:20,wave:0,score:0,state:"ready",message:"Build your first elemental tower.",speed,combo:0,best,muted,veteran,screenShake,damageNumbers,ability:0,aiming:false,nextReady:false,rushBonus:0});
   },[]);
   useEffect(()=>{reset();try{setAutoWaves(localStorage.getItem("warden-auto-waves")==="true");if(localStorage.getItem("warden-tutorial-done")!=="true")setTutorialStep(1)}catch{/* Storage is optional. */}},[reset]);
-  useEffect(()=>{const image=new Image();image.src="/assets/towers/ember-forge-l1.png";image.onload=()=>{emberForgeArt=image};return()=>{if(emberForgeArt===image)emberForgeArt=null}},[]);
+  useEffect(()=>{const image=new Image();image.src="/assets/towers/ember-forge-l1-v2.png";image.onload=()=>{emberForgeArt=image};return()=>{if(emberForgeArt===image)emberForgeArt=null}},[]);
 
   const sync=()=>{const g=game.current;if(g){const nextReady=g.state==="wave"&&!g.spawn.length&&g.enemies.some((e:Enemy)=>e.alive)&&g.wave<waves.length,rushBonus=nextReady?Math.min(30,g.enemies.filter((e:Enemy)=>e.alive).length*3):0;setUi({gold:g.gold,lives:g.lives,wave:g.wave,score:g.score,state:g.state,message:g.message,speed:g.speed,combo:g.combo,best:g.best,muted:g.muted,veteran:g.veteran,screenShake:g.screenShake,damageNumbers:g.damageNumbers,ability:g.ability,aiming:g.aiming,nextReady,rushBonus})}};
   const toggleSetting=(key:"muted"|"veteran"|"screenShake"|"damageNumbers",storage:string)=>{const g=game.current;if(!g)return;g[key]=!g[key];try{localStorage.setItem(storage,String(g[key]))}catch{/* Storage is optional. */}sync()};
@@ -165,7 +165,9 @@ function towerArt(c:CanvasRenderingContext2D,t:Tower,selected:boolean,time:numbe
   c.save();c.translate(x,y);c.scale(1+recoil*.045,1-recoil*.07);c.translate(-x,-y-recoil*3);
   if(t.element==="fire"&&lv===1&&emberForgeArt?.complete){
     const breathe=.5+.5*Math.sin(time*4.2+t.id),smoke=(time*.34+t.id*.17)%1;
-    c.fillStyle="#26342d55";c.beginPath();c.ellipse(x+5,y+25,38,12,0,0,Math.PI*2);c.fill();c.drawImage(emberForgeArt,x-46,y-82,92,108);
+    c.fillStyle="#18271f77";c.beginPath();c.ellipse(x+2,y+20,35,10,0,0,Math.PI*2);c.fill();
+    // Crop the chroma-key source padding so the masonry visibly meets its pad.
+    c.drawImage(emberForgeArt,10,70,1100,1190,x-45,y-75,90,98);
     c.globalAlpha=.32+.3*breathe;c.shadowColor="#ff6a3d";c.shadowBlur=18+8*breathe;c.fillStyle="#ff9b4d";c.beginPath();c.ellipse(x,y-7,7+2*breathe,10+3*breathe,0,0,Math.PI*2);c.fill();c.shadowBlur=0;c.globalAlpha=1;
     for(let i=0;i<3;i++){const p=(smoke+i/3)%1,drift=Math.sin(time*1.7+i)*5;c.globalAlpha=(1-p)*.25;c.fillStyle="#ded7c1";c.beginPath();c.arc(x-17+drift*p,y-57-p*25,3+p*7,0,Math.PI*2);c.fill()}
     c.globalAlpha=1;if(recoil>.15){c.fillStyle="#ffd36c";for(let i=0;i<4;i++){const a=i*Math.PI/2+time*3;c.fillRect(x+Math.cos(a)*(13+recoil*8)-1,y-11+Math.sin(a)*(10+recoil*6)-1,3,3)}}c.restore();return
