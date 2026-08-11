@@ -221,10 +221,22 @@ function enemyArt(c:CanvasRenderingContext2D,e:Enemy,time:number){
   c.restore();
 }
 
+function ambientWild(c:CanvasRenderingContext2D,time:number){
+  c.save();
+  // Slow canopy shadows create depth without obscuring the combat lane.
+  c.globalAlpha=.1;c.fillStyle="#102d20";for(let i=0;i<8;i++){const x=(i*173+Math.sin(time*.12+i)*24)%1080-40,y=i%2?26:585;c.beginPath();c.ellipse(x,y,72+i%3*18,24+i%2*11,Math.sin(i)*.2,0,Math.PI*2);c.fill()}
+  // Reeds bend together beside the river, visually tying it into the woodland.
+  c.globalAlpha=.75;c.strokeStyle="#244f36";c.lineWidth=3;for(let i=0;i<28;i++){const x=18+i*37,y=515+Math.sin(i*.8)*19,sway=Math.sin(time*1.2+i*.65)*4;c.beginPath();c.moveTo(x,y+17);c.quadraticCurveTo(x+sway,y+6,x+sway*.7,y-5);c.stroke();c.fillStyle=i%3?"#76934c":"#b79245";c.beginPath();c.ellipse(x+sway*.7,y-7,2.4,6,.25,0,Math.PI*2);c.fill()}
+  // Pollen motes and fireflies give the clearing a restrained living rhythm.
+  for(let i=0;i<18;i++){const x=(i*83+time*(3+i%3))%1040-20,y=70+(i*67)%430+Math.sin(time*(.7+i%4*.12)+i)*12,pulse=.25+.55*(.5+.5*Math.sin(time*2.2+i*1.7));c.globalAlpha=pulse;c.fillStyle=i%4===0?"#f6df73":"#d7eca1";c.shadowColor=c.fillStyle;c.shadowBlur=i%4===0?8:3;c.beginPath();c.arc(x,y,i%4===0?2.2:1.2,0,Math.PI*2);c.fill()}
+  c.restore();
+}
+
 function draw(canvas:HTMLCanvasElement|null,g:any,selected:Element){if(!canvas||!g)return;const c=canvas.getContext("2d")!;c.save();const sx=g.screenShake?(Math.random()-.5)*g.shake:0,sy=g.screenShake?(Math.random()-.5)*g.shake:0;c.translate(sx,sy);const grad=c.createLinearGradient(0,0,0,H);grad.addColorStop(0,"#77a55d");grad.addColorStop(1,"#396d4b");c.fillStyle=grad;c.fillRect(-20,-20,W+40,H+40);
   // terrain texture
   c.globalAlpha=.18;c.fillStyle="#d8e88e";for(let i=0;i<90;i++){const x=(i*137)%W,y=(i*83)%H;c.beginPath();c.arc(x,y,2+(i%4),0,Math.PI*2);c.fill()}c.globalAlpha=1;
   [[35,62,1.1],[82,43,.85],[155,42,1],[245,53,.82],[365,48,.95],[456,62,.8],[580,52,1],[690,54,.82],[780,56,1],[940,65,1.15],[48,475,1.1],[125,520,.88],[212,495,1],[325,555,1.08],[440,520,.85],[590,535,1],[735,548,1.05],[850,520,.85],[960,535,1.1]].forEach(v=>tree(c,v[0],v[1],v[2]));
+  ambientWild(c,g.time);
   ruin(c,336,470,.95);ruin(c,760,76,.72);flowerPatch(c,156,350,"#d9a5ee");flowerPatch(c,450,405,"#fff1a1");flowerPatch(c,870,95,"#ef9d8c");
   // The Hollow gate gives the enemy entrance a clear story silhouette.
   c.fillStyle="#17251d";c.strokeStyle="#394a32";c.lineWidth=7;c.beginPath();c.arc(0,178,48,-Math.PI/2,Math.PI/2);c.lineTo(0,226);c.closePath();c.fill();c.stroke();c.strokeStyle="#a57042";c.lineWidth=5;for(const y of [146,178,210]){c.beginPath();c.moveTo(4,y);c.lineTo(28,y-13);c.stroke()}c.fillStyle="#e07842";c.shadowColor="#ff7b3d";c.shadowBlur=14;c.beginPath();c.arc(14,178,5+Math.sin(g.time*5),0,Math.PI*2);c.fill();c.shadowBlur=0;
